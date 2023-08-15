@@ -218,10 +218,10 @@ set(unittest_libs ${unittest_libs}
     )
 
 if (MILVUS_GPU_VERSION)
-    include_directories("${CUDA_INCLUDE_DIRS}")
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
+    include_directories("${HIP_INCLUDE_DIRS}")
+    link_directories("${HIP_ROOT_DIR}/lib")
     set(unittest_libs ${unittest_libs}
-            ${CUDA_TOOLKIT_ROOT_DIR}/lib64/stubs/libnvidia-ml.so
+            ${HIP_ROOT_DIR}/lib/libamdhip64.so
             )
 endif ()
 

@@ -1,11 +1,11 @@
 # Build avx2 version
-CXXFLAGS="-mavx2 -mf16c" ./configure --with-cuda=$CUDA_ROOT --with-cuda-arch="$CUDA_ARCH"
+CXXFLAGS="-mavx2 -mf16c" ./configure --with-hip=$HIP_ROOT --with-hip-arch="$HIP_ARCH"
 make -j $CPU_COUNT
 make -C python _swigfaiss_avx2.so
 make clean
 
 # Build vanilla version (no avx)
-./configure --with-cuda=$CUDA_ROOT --with-cuda-arch="$CUDA_ARCH"
+./configure --with-hip=$HIP_ROOT --with-hip-arch="$HIP_ARCH"
 make -j $CPU_COUNT
 make -C python _swigfaiss.so
 

@@ -10,7 +10,7 @@
 #ifndef FAISS_DIRECT_MAP_H
 #define FAISS_DIRECT_MAP_H
 
-#include <faiss/InvertedLists.h>
+#include "faiss/InvertedLists.h"
 #include <unordered_map>
 
 

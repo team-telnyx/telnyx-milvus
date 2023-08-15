@@ -5,7 +5,7 @@ BUILD_UNITTEST="OFF"
 INSTALL_PREFIX=$(pwd)/cmake_build
 MAKE_CLEAN="OFF"
 PROFILING="OFF"
-FAISS_WITH_MKL="OFF"
+FAISS_WITH_MKL="ON"
 
 while getopts "p:d:t:uhrcgm" arg
 do
@@ -62,13 +62,13 @@ fi
 
 cd cmake_build
 
-CUDA_COMPILER=/usr/local/cuda/bin/nvcc
+HIP_COMPILER=/opt/rocm-5.3.0/bin/hipcc
 
 if [[ ${MAKE_CLEAN} == "ON" ]]; then
     CMAKE_CMD="cmake -DBUILD_UNIT_TEST=${BUILD_UNITTEST} \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-    -DCMAKE_CUDA_COMPILER=${CUDA_COMPILER} \
+    -DCMAKE_PREFIX_PATH=${HIP_ROOT_DIR} \
     -DMILVUS_ENABLE_PROFILING=${PROFILING} \
     -DFAISS_WITH_MKL=${FAISS_WITH_MKL} \
     ../"

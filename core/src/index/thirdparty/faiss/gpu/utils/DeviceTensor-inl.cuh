@@ -37,7 +37,7 @@ DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>&
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::operator=(
   DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>&& t) {
   if (this->state_ == AllocState::Owner) {
-    CUDA_VERIFY(cudaFree(this->data_));
+    HIP_VERIFY(hipFree(this->data_));
   }
 
   this->Tensor<T, Dim, InnerContig, IndexT, PtrTraits>::operator=(
@@ -56,7 +56,7 @@ __host__
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::~DeviceTensor() {
   if (state_ == AllocState::Owner) {
     FAISS_ASSERT(this->data_ || (this->getSizeInBytes() == 0));
-    CUDA_VERIFY(cudaFree(this->data_));
+    HIP_VERIFY(hipFree(this->data_));
     this->data_ = nullptr;
   }
 
@@ -99,7 +99,7 @@ __host__
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::DeviceTensor(
   DeviceMemory& m,
   const IndexT sizes[Dim],
-  cudaStream_t stream,
+  hipStream_t stream,
   MemorySpace space) :
     Tensor<T, Dim, InnerContig, IndexT, PtrTraits>(nullptr, sizes),
     state_(AllocState::Reservation),
@@ -120,7 +120,7 @@ __host__
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::DeviceTensor(
   DeviceMemory& m,
   std::initializer_list<IndexT> sizes,
-  cudaStream_t stream,
+  hipStream_t stream,
   MemorySpace space) :
     Tensor<T, Dim, InnerContig, IndexT, PtrTraits>(nullptr, sizes),
     state_(AllocState::Reservation),
@@ -176,7 +176,7 @@ template <typename T, int Dim, bool InnerContig,
 __host__
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::DeviceTensor(
   Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-  cudaStream_t stream,
+  hipStream_t stream,
   MemorySpace space) :
     Tensor<T, Dim, InnerContig, IndexT, PtrTraits>(nullptr, t.sizes(), t.strides()),
     state_(AllocState::Owner),
@@ -193,7 +193,7 @@ __host__
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::DeviceTensor(
   DeviceMemory& m,
   Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-  cudaStream_t stream,
+  hipStream_t stream,
   MemorySpace space) :
     Tensor<T, Dim, InnerContig, IndexT, PtrTraits>(nullptr, t.sizes(), t.strides()),
     state_(AllocState::Reservation),
@@ -213,12 +213,12 @@ template <typename T, int Dim, bool InnerContig,
           typename IndexT, template <typename U> class PtrTraits>
 __host__ DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>&
 DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>::zero(
-  cudaStream_t stream) {
+  hipStream_t stream) {
   if (this->data_) {
     // Region must be contiguous
     FAISS_ASSERT(this->isContiguous());
 
-    CUDA_VERIFY(cudaMemsetAsync(
+    HIP_VERIFY(hipMemsetAsync(
                   this->data_, 0, this->getSizeInBytes(), stream));
   }
 

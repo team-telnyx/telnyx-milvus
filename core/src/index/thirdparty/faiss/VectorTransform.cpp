@@ -8,6 +8,7 @@
 // -*- c++ -*-
 
 #include <faiss/VectorTransform.h>
+// #include <faiss/utils/sgemm.c>
 
 #include <cstdio>
 #include <cmath>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cublas_v2.h>
+#include <hipblas/hipblas.h>
 #include <faiss/gpu/utils/Tensor.cuh>
 #include <faiss/gpu/utils/DeviceTensor.cuh>
 #include <faiss/gpu/utils/HostTensor.cuh>
@@ -27,8 +27,8 @@ runMatrixMult(Tensor<float, 2, true>& c, bool transC,
               Tensor<BT, 2, true>& b, bool transB,
               float alpha,
               float beta,
-              cublasHandle_t handle,
-              cudaStream_t stream);
+              hipblasHandle_t handle,
+              hipStream_t stream);
 
 /// C_i = alpha * A_i * B_i + beta * C_i
 /// where `i` is the outermost dimension, via iterated gemm
@@ -39,8 +39,8 @@ void runIteratedMatrixMult(Tensor<float, 3, true>& c, bool transC,
                            Tensor<BT, 3, true>& b, bool transB,
                            float alpha,
                            float beta,
-                           cublasHandle_t handle,
-                           cudaStream_t stream);
+                           hipblasHandle_t handle,
+                           hipStream_t stream);
 
 /// C_i = alpha * A_i * B_i + beta * C_i
 /// where `i` is the outermost dimension, via batched gemm
@@ -51,8 +51,8 @@ void runBatchMatrixMult(Tensor<float, 3, true>& c, bool transC,
                         float alpha,
                         float beta,
                         DeviceMemory& mem,
-                        cublasHandle_t handle,
-                        cudaStream_t stream);
+                        hipblasHandle_t handle,
+                        hipStream_t stream);
 
 } } // namespace
 

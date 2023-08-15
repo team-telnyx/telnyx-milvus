@@ -39,14 +39,16 @@ set(util_srcs
         )
 
 if (KNOWHERE_GPU_VERSION)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    set(cuda_lib
-            cudart
-            cublas
+    find_package(HIPToolkit REQUIRED)
+    include_directories(${HIP_INCLUDE_DIRS})
+    link_directories("${HIP_ROOT_DIR}/lib")
+    set(hip_lib
+            ${ROCM_PATH}/lib/librocm_smi64.so
+            HIP::hiprt
+            hipblas
             )
     set(basic_libs ${basic_libs}
-            ${cuda_lib}
+            ${hip_lib}
             )
     set(util_srcs ${util_srcs}
             ${INDEX_SOURCE_DIR}/knowhere/knowhere/index/vector_index/helpers/FaissGpuResourceMgr.cpp

@@ -41,7 +41,7 @@ int faiss_StandardGpuResources_setTempMemory(FaissStandardGpuResources*, size_t 
 int faiss_StandardGpuResources_setPinnedMemory(FaissStandardGpuResources*, size_t size);
 
 /// Called to change the stream for work ordering
-int faiss_StandardGpuResources_setDefaultStream(FaissStandardGpuResources*, int device, cudaStream_t stream);
+int faiss_StandardGpuResources_setDefaultStream(FaissStandardGpuResources*, int device, hipStream_t stream);
 
 /// Called to change the work ordering streams to the null stream
 /// for all devices

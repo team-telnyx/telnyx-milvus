@@ -199,15 +199,17 @@ set(third_party_libs
         )
 
 if (MILVUS_GPU_VERSION)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    set(cuda_lib
-            ${CUDA_TOOLKIT_ROOT_DIR}/lib64/stubs/libnvidia-ml.so
-            cudart
-            cublas
+    find_package(HIPToolkit REQUIRED)
+    include_directories(${HIP_INCLUDE_DIRS})
+    link_directories("${HIP_ROOT_DIR}/lib")
+    set(hip_lib
+            ${HIP_ROOT_DIR}/lib/libamdhip64.so
+            ${ROCM_PATH}/lib/librocm_smi64.so
+            HIP::hiprt
+            hipblas
             )
     set(third_party_libs ${third_party_libs}
-            ${cuda_lib}
+            ${hip_lib}
             )
     aux_source_directory(${MILVUS_ENGINE_SRC}/wrapper/gpu wrapper_gpu_files)
     set(engine_files ${engine_files}
@@ -259,10 +261,22 @@ endif ()
 
 add_library(milvus_engine STATIC ${engine_files})
 add_dependencies(milvus_engine fiu)
-target_link_libraries(milvus_engine
-        knowhere
+
+find_library(KNOWHERE_LIB libknowhere.a)
+if(NOT KNOWHERE_LIB)
+    message(FATAL_ERROR "knowhere library not found.")
+endif()
+
+find_library(SPTAGLibStatic libSPTAGLibStatic.a REQUIRED)
+if(NOT SPTAGLibStatic)
+        message(FATAL_ERROR "SPTAGLibStatic not found!!!!!!!!!!!!!")
+endif()
+
+target_link_libraries(milvus_engine PUBLIC
+        ${KNOWHERE_LIB}
         ${third_party_libs}
         ${engine_libs}
+        ${SPTAGLibStatic}
         )
 
 if (MILVUS_WITH_PROMETHEUS)
@@ -294,12 +308,18 @@ set(tracing_lib
         z
         )
 target_link_libraries(tracing ${tracing_lib})
-
-set(server_libs
+find_library(faisslib libfaiss.a)
+if(NOT faisslib)
+    message(FATAL_ERROR "faiss library not found.")
+endif()
+find_package(MKL REQUIRED)
+set(server_libs PUBLIC
         milvus_engine
         metrics
         tracing
         oatpp
+        ${faisslib}
+        ${MKL_LIBRARIES}
         )
 
 add_executable(milvus_server

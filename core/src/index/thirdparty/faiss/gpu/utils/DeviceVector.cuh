@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include "hip/hip_runtime.h"
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/gpu/utils/DeviceUtils.h>
 #include <faiss/gpu/utils/MemorySpace.h>
 #include <faiss/gpu/utils/StaticUtils.h>
 #include <algorithm>
-#include <cuda.h>
 #include <vector>
 
 namespace faiss { namespace gpu {
@@ -64,12 +64,12 @@ class DeviceVector {
   const T* data() const { return data_; }
 
   template <typename OutT>
-  std::vector<OutT> copyToHost(cudaStream_t stream) const {
+  std::vector<OutT> copyToHost(hipStream_t stream) const {
     FAISS_ASSERT(num_ * sizeof(T) % sizeof(OutT) == 0);
 
     std::vector<OutT> out((num_ * sizeof(T)) / sizeof(OutT));
-    CUDA_VERIFY(cudaMemcpyAsync(out.data(), data_, num_ * sizeof(T),
-                                cudaMemcpyDeviceToHost, stream));
+    HIP_VERIFY(hipMemcpyAsync(out.data(), data_, num_ * sizeof(T),
+                                hipMemcpyDeviceToHost, stream));
 
     return out;
   }
@@ -79,7 +79,7 @@ class DeviceVector {
   // we need for what we're appending
   bool append(const T* d,
               size_t n,
-              cudaStream_t stream,
+              hipStream_t stream,
               bool reserveExact = false) {
     bool mem = false;
 
@@ -93,11 +93,11 @@ class DeviceVector {
 
       int dev = getDeviceForAddress(d);
       if (dev == -1) {
-        CUDA_VERIFY(cudaMemcpyAsync(data_ + num_, d, n * sizeof(T),
-                                    cudaMemcpyHostToDevice, stream));
+        HIP_VERIFY(hipMemcpyAsync(data_ + num_, d, n * sizeof(T),
+                                    hipMemcpyHostToDevice, stream));
       } else {
-        CUDA_VERIFY(cudaMemcpyAsync(data_ + num_, d, n * sizeof(T),
-                                    cudaMemcpyDeviceToDevice, stream));
+        HIP_VERIFY(hipMemcpyAsync(data_ + num_, d, n * sizeof(T),
+                                    hipMemcpyDeviceToDevice, stream));
       }
       num_ += n;
     }
@@ -106,7 +106,7 @@ class DeviceVector {
   }
 
   // Returns true if we actually reallocated memory
-  bool resize(size_t newSize, cudaStream_t stream) {
+  bool resize(size_t newSize, hipStream_t stream) {
     bool mem = false;
 
     if (num_ < newSize) {
@@ -124,7 +124,7 @@ class DeviceVector {
   // remain for subsequent allocations (if `exact` false) or to
   // exactly the space we need (if `exact` true); returns space
   // reclaimed in bytes
-  size_t reclaim(bool exact, cudaStream_t stream) {
+  size_t reclaim(bool exact, hipStream_t stream) {
     size_t free = capacity_ - num_;
 
     if (exact) {
@@ -152,7 +152,7 @@ class DeviceVector {
   }
 
   // Returns true if we actually reallocated memory
-  bool reserve(size_t newCapacity, cudaStream_t stream) {
+  bool reserve(size_t newCapacity, hipStream_t stream) {
     if (newCapacity <= capacity_) {
       return false;
     }
@@ -163,14 +163,14 @@ class DeviceVector {
   }
 
  private:
-  void realloc_(size_t newCapacity, cudaStream_t stream) {
+  void realloc_(size_t newCapacity, hipStream_t stream) {
     FAISS_ASSERT(num_ <= newCapacity);
     FAISS_ASSERT_MSG(owner, "Cannot realloc due to no ownership of mem");
 
     T* newData = nullptr;
     allocMemorySpace(space_, &newData, newCapacity * sizeof(T));
-    CUDA_VERIFY(cudaMemcpyAsync(newData, data_, num_ * sizeof(T),
-                                cudaMemcpyDeviceToDevice, stream));
+    HIP_VERIFY(hipMemcpyAsync(newData, data_, num_ * sizeof(T),
+                                hipMemcpyDeviceToDevice, stream));
     freeMemorySpace(space_, data_);
 
     data_ = newData;

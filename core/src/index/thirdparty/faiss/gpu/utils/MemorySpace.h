@@ -8,27 +8,28 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
-#if CUDA_VERSION >= 8000
-// Whether or not we enable usage of CUDA Unified Memory
+#if HIP_VERSION_MAJOR >= 4 && HIP_VERSION_MINOR >= 2
+// Whether or not we enable usage of HIP Unified Memory
 #define FAISS_UNIFIED_MEM 1
 #endif
+
 
 namespace faiss { namespace gpu {
 
 enum MemorySpace {
-  /// Managed using cudaMalloc/cudaFree
+  /// Managed using hipMalloc/hipFree
   Device = 1,
-  /// Managed using cudaMallocManaged/cudaFree
+  /// Managed using hipMallocManaged/hipFree
   Unified = 2,
-  /// Managed using cudaHostAlloc/cudaFreeHost
+  /// Managed using hipHostAlloc/hipFreeHost
   HostPinned = 3,
 };
 
 /// All memory allocations and de-allocations come through these functions
 
-/// Allocates CUDA memory for a given memory space (void pointer)
+/// Allocates HIP memory for a given memory space (void pointer)
 /// Throws a FaissException if we are unable to allocate the memory
 void allocMemorySpaceV(MemorySpace space, void** p, size_t size);
 
@@ -37,7 +38,7 @@ inline void allocMemorySpace(MemorySpace space, T** p, size_t size) {
   allocMemorySpaceV(space, (void**)(void*) p, size);
 }
 
-/// Frees CUDA memory for a given memory space
+/// Frees HIP memory for a given memory space
 /// Asserts if we are unable to free the region
 void freeMemorySpace(MemorySpace space, void* p);
 

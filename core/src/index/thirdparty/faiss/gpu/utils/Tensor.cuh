@@ -9,11 +9,10 @@
 #pragma once
 
 #include <assert.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #include <initializer_list>
 
-/// Multi-dimensional array class for CUDA device and host usage.
+/// Multi-dimensional array class for HIP device and host usage.
 /// Originally from Facebook's fbcunn, since added to the Torch GPU
 /// library cutorch as well.
 
@@ -113,11 +112,11 @@ class Tensor {
 
   /// Copies a tensor into ourselves; sizes must match
   __host__ void copyFrom(Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-                         cudaStream_t stream);
+                         hipStream_t stream);
 
   /// Copies ourselves into a tensor; sizes must match
   __host__ void copyTo(Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-                       cudaStream_t stream);
+                       hipStream_t stream);
 
   /// Returns true if the two tensors are of the same dimensionality,
   /// size and stride.

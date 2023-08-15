@@ -16,14 +16,14 @@ void runL2Norm(Tensor<float, 2, true>& input,
                bool inputRowMajor,
                Tensor<float, 1, true>& output,
                bool normSquared,
-               cudaStream_t stream);
+               hipStream_t stream);
 
 #ifdef FAISS_USE_FLOAT16
 void runL2Norm(Tensor<half, 2, true>& input,
                bool inputRowMajor,
                Tensor<float, 1, true>& output,
                bool normSquared,
-               cudaStream_t stream);
+               hipStream_t stream);
 #endif
 
 } } // namespace

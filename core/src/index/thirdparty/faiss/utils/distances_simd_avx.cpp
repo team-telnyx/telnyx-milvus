@@ -1,7 +1,7 @@
 
 // -*- c++ -*-
 
-#include <faiss/utils/distances_avx.h>
+#include "distances_avx.h"
 #include <faiss/impl/FaissAssert.h>
 
 #include <cstdio>

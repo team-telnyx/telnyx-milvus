@@ -7,8 +7,8 @@
 
 // -*- c++ -*-
 
-#include <faiss/impl/ScalarQuantizerDC_avx512.h>
-#include <faiss/impl/ScalarQuantizerCodec_avx512.h>
+#include "ScalarQuantizerDC_avx512.h"
+#include "ScalarQuantizerCodec_avx512.h"
 
 namespace faiss {
 

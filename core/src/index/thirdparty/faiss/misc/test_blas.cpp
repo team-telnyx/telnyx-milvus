@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+// #include <faiss/utils/sgemm.c>
 
 #undef FINTEGER
 #define FINTEGER long

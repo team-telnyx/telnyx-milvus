@@ -7,7 +7,7 @@
 
 
 #include <faiss/gpu/test/TestUtils.h>
-#include <faiss/gpu/utils/BlockSelectKernel.cuh>
+#include <faiss/gpu/utils/BlockSelectKernel.h>
 #include <faiss/gpu/utils/DeviceDefs.cuh>
 #include <faiss/gpu/utils/DeviceTensor.cuh>
 #include <faiss/gpu/utils/DeviceUtils.h>

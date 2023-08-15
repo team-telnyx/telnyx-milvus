@@ -28,7 +28,7 @@
 #include "knowhere/index/vector_index/fpga/IndexFPGAIVFPQ.h"
 #endif
 #ifdef MILVUS_GPU_VERSION
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include "knowhere/index/vector_index/gpu/IndexGPUIDMAP.h"
 #include "knowhere/index/vector_index/gpu/IndexGPUIVF.h"
 #include "knowhere/index/vector_index/gpu/IndexGPUIVFPQ.h"

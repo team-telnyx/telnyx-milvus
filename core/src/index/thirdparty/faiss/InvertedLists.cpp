@@ -17,19 +17,18 @@
 
 #ifndef USE_CPU
 #include "gpu/utils/DeviceUtils.h"
-#include "cuda.h"
-#include "cuda_runtime.h"
+#include "hip/hip_runtime.h"
 
 namespace faiss {
 
 /*
- * Use pin memory to build Readonly Inverted list will accelerate cuda memory copy, but it will downgrade cpu ivf search
+ * Use pin memory to build Readonly Inverted list will accelerate hip memory copy, but it will downgrade cpu ivf search
  * performance. read only inverted list structure will also make ivf search performance not stable. ISSUE 500 mention
  * this problem. Best performance is the original inverted list with non pin memory.
  */
 
 PageLockMemory::PageLockMemory(size_t size) : nbytes(size) {
-    auto err = cudaHostAlloc(&(this->data), size, 0);
+    auto err = hipHostAlloc(&(this->data), size, 0);
     if (err) {
         std::string msg =
             "Fail to alloc page lock memory " + std::to_string(size) + ", err code " + std::to_string((int32_t)err);
@@ -38,11 +37,11 @@ PageLockMemory::PageLockMemory(size_t size) : nbytes(size) {
 }
 
 PageLockMemory::~PageLockMemory() {
-    CUDA_VERIFY(cudaFreeHost((void*)(this->data)));
+    HIP_VERIFY(hipHostFree((void*)(this->data)));
 }
 
 PageLockMemory::PageLockMemory(const PageLockMemory& other) {
-    auto err = cudaHostAlloc(&(this->data), other.nbytes, 0);
+    auto err = hipHostAlloc(&(this->data), other.nbytes, 0);
     if (err) {
         std::string msg = "Fail to alloc page lock memory " + std::to_string(other.nbytes) + ", err code " +
                           std::to_string((int32_t)err);

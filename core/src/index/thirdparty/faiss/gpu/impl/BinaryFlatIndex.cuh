@@ -29,7 +29,7 @@ class BinaryFlatIndex {
   int getDim() const;
 
   /// Reserve storage that can contain at least this many vectors
-  void reserve(size_t numVecs, cudaStream_t stream);
+  void reserve(size_t numVecs, hipStream_t stream);
 
   /// Returns a reference to our vectors currently in use
   Tensor<unsigned char, 2, true>& getVectorsRef();
@@ -41,7 +41,7 @@ class BinaryFlatIndex {
 
   /// Add vectors to ourselves; the pointer passed can be on the host
   /// or the device
-  void add(const unsigned char* data, int numVecs, cudaStream_t stream);
+  void add(const unsigned char* data, int numVecs, hipStream_t stream);
 
   /// Free all storage
   void reset();

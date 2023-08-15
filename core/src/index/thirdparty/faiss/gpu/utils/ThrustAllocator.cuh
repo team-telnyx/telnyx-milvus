@@ -9,7 +9,7 @@
 #pragma once
 
 #include <faiss/gpu/utils/MemorySpace.h>
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <unordered_set>
 
 namespace faiss { namespace gpu {

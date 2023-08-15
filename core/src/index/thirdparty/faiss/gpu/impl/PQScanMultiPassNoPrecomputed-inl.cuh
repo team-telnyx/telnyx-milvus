@@ -242,7 +242,7 @@ runMultiPassTile(Tensor<float, 2, true>& queries,
                  faiss::MetricType metric,
                  Tensor<float, 2, true>& outDistances,
                  Tensor<long, 2, true>& outIndices,
-                 cudaStream_t stream) {
+                 hipStream_t stream) {
   // We only support two metrics at the moment
   FAISS_ASSERT(metric == MetricType::METRIC_INNER_PRODUCT ||
                metric == MetricType::METRIC_L2);
@@ -375,7 +375,7 @@ runMultiPassTile(Tensor<float, 2, true>& queries,
 #undef RUN_PQ_OPT
   }
 
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 
   // k-select the output in chunks, to increase parallelism
   runPass1SelectLists(listIndices,
@@ -502,11 +502,11 @@ runPQScanMultiPassNoPrecomputed(Tensor<float, 2, true>& queries,
 
   // Make sure the element before prefixSumOffsets is 0, since we
   // depend upon simple, boundary-less indexing to get proper results
-  CUDA_VERIFY(cudaMemsetAsync(prefixSumOffsetSpace1.data(),
+  HIP_VERIFY(hipMemsetAsync(prefixSumOffsetSpace1.data(),
                               0,
                               sizeof(int),
                               stream));
-  CUDA_VERIFY(cudaMemsetAsync(prefixSumOffsetSpace2.data(),
+  HIP_VERIFY(hipMemsetAsync(prefixSumOffsetSpace2.data(),
                               0,
                               sizeof(int),
                               stream));

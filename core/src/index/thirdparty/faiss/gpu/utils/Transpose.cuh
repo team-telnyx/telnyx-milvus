@@ -12,7 +12,7 @@
 #include <faiss/gpu/utils/Tensor.cuh>
 #include <faiss/gpu/utils/DeviceUtils.h>
 #include <faiss/gpu/utils/StaticUtils.h>
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
 namespace faiss { namespace gpu {
 
@@ -102,7 +102,7 @@ template <typename T, int Dim>
 void runTransposeAny(Tensor<T, Dim, true>& in,
                      int dim1, int dim2,
                      Tensor<T, Dim, true>& out,
-                     cudaStream_t stream) {
+                     hipStream_t stream) {
   static_assert(Dim <= TensorInfo<T, unsigned int>::kMaxDims,
                 "too many dimensions");
 
@@ -148,7 +148,7 @@ void runTransposeAny(Tensor<T, Dim, true>& in,
     transposeAny<T, unsigned long, Dim, -1>
       <<<grid, block, 0, stream>>>(inInfo, outInfo, totalSize);
   }
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 }
 
 } } // namespace

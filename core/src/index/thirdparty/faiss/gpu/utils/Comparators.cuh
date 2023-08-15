@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <faiss/gpu/utils/Float16.cuh>
 
 namespace faiss { namespace gpu {

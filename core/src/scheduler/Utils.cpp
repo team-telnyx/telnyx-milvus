@@ -12,7 +12,7 @@
 #include "scheduler/Utils.h"
 
 #ifdef MILVUS_GPU_VERSION
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #endif
 #include <chrono>
 #include <set>

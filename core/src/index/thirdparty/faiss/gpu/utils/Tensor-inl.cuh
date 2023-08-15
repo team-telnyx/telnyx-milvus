@@ -129,7 +129,7 @@ template <typename T, int Dim, bool InnerContig,
 __host__ void
 Tensor<T, Dim, InnerContig, IndexT, PtrTraits>::copyFrom(
   Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-  cudaStream_t stream) {
+  hipStream_t stream) {
   // The tensor must be fully contiguous
   GPU_FAISS_ASSERT(this->isContiguous());
 
@@ -146,18 +146,18 @@ Tensor<T, Dim, InnerContig, IndexT, PtrTraits>::copyFrom(
     int tDev = getDeviceForAddress(t.data());
 
     if (tDev == -1) {
-      CUDA_VERIFY(cudaMemcpyAsync(this->data_,
+      HIP_VERIFY(hipMemcpyAsync(this->data_,
                                   t.data(),
                                   this->getSizeInBytes(),
-                                  ourDev == -1 ? cudaMemcpyHostToHost :
-                                  cudaMemcpyHostToDevice,
+                                  ourDev == -1 ? hipMemcpyHostToHost :
+                                  hipMemcpyHostToDevice,
                                   stream));
     } else {
-      CUDA_VERIFY(cudaMemcpyAsync(this->data_,
+      HIP_VERIFY(hipMemcpyAsync(this->data_,
                                   t.data(),
                                   this->getSizeInBytes(),
-                                  ourDev == -1 ? cudaMemcpyDeviceToHost :
-                                  cudaMemcpyDeviceToDevice,
+                                  ourDev == -1 ? hipMemcpyDeviceToHost :
+                                  hipMemcpyDeviceToDevice,
                                   stream));
     }
   }
@@ -168,7 +168,7 @@ template <typename T, int Dim, bool InnerContig,
 __host__ void
 Tensor<T, Dim, InnerContig, IndexT, PtrTraits>::copyTo(
   Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-  cudaStream_t stream) {
+  hipStream_t stream) {
   // The tensor must be fully contiguous
   GPU_FAISS_ASSERT(this->isContiguous());
 
@@ -185,18 +185,18 @@ Tensor<T, Dim, InnerContig, IndexT, PtrTraits>::copyTo(
     int tDev = getDeviceForAddress(t.data());
 
     if (tDev == -1) {
-      CUDA_VERIFY(cudaMemcpyAsync(t.data(),
+      HIP_VERIFY(hipMemcpyAsync(t.data(),
                                   this->data_,
                                   this->getSizeInBytes(),
-                                  ourDev == -1 ? cudaMemcpyHostToHost :
-                                  cudaMemcpyDeviceToHost,
+                                  ourDev == -1 ? hipMemcpyHostToHost :
+                                  hipMemcpyDeviceToHost,
                                   stream));
     } else {
-      CUDA_VERIFY(cudaMemcpyAsync(t.data(),
+      HIP_VERIFY(hipMemcpyAsync(t.data(),
                                   this->data_,
                                   this->getSizeInBytes(),
-                                  ourDev == -1 ? cudaMemcpyHostToDevice :
-                                  cudaMemcpyDeviceToDevice,
+                                  ourDev == -1 ? hipMemcpyHostToDevice :
+                                  hipMemcpyDeviceToDevice,
                                   stream));
     }
   }

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <faiss/IndexIVF.h>
+#include "../IndexIVF.h"
 #include <faiss/impl/ScalarQuantizerOp.h>
 
 namespace faiss {

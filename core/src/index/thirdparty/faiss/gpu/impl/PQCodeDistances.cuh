@@ -10,7 +10,7 @@
 
 #include <faiss/gpu/utils/Tensor.cuh>
 #include <faiss/gpu/utils/NoTypeTensor.cuh>
-#include <cublas_v2.h>
+#include <hipblas/hipblas.h>
 
 namespace faiss { namespace gpu {
 
@@ -28,7 +28,7 @@ void runPQCodeDistances(Tensor<float, 3, true>& pqCentroids,
                         NoTypeTensor<4, true>& outCodeDistances,
                         bool l2Distance,
                         bool useFloat16Lookup,
-                        cudaStream_t stream);
+                        hipStream_t stream);
 
 template <typename CentroidT>
 void runPQCodeDistancesMM(Tensor<float, 3, true>& pqCentroids,
@@ -38,8 +38,8 @@ void runPQCodeDistancesMM(Tensor<float, 3, true>& pqCentroids,
                           NoTypeTensor<4, true>& outCodeDistances,
                           bool useFloat16Lookup,
                           DeviceMemory& mem,
-                          cublasHandle_t handle,
-                          cudaStream_t stream);
+                          hipblasHandle_t handle,
+                          hipStream_t stream);
 
 } } // namespace
 

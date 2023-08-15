@@ -125,12 +125,12 @@ PYTHON = /usr/bin/python
 
 
 # root of the cuda 8 installation
-CUDAROOT     = /usr/local/cuda-8.0
-NVCC         = $(CUDAROOT)/bin/nvcc
-NVCCLDFLAGS  = -L$(CUDAROOT)/lib64
-NVCCLIBS     = -lcudart -lcublas -lcuda
-CUDACFLAGS   = -I$(CUDAROOT)/include
-NVCCFLAGS    = -I $(CUDAROOT)/targets/x86_64-linux/include/ \
+HIPROOT     = /opt/rocm-5.3.0/hip
+HIPCC         = $(HIPROOT)/bin/hipcc
+HIPCCLDFLAGS  = -L$(HIPROOT)/lib
+HIPCCLIBS     = -lhiprt -lhipblas -lhip
+CUDACFLAGS   = -I$(HIPROOT)/include
+NVCCFLAGS    = -I $(HIPROOT)/targets/x86_64-linux/include/ \
 -Xcompiler -fPIC \
 -Xcudafe --diag_suppress=unrecognized_attribute \
 -gencode arch=compute_35,code="compute_35" \

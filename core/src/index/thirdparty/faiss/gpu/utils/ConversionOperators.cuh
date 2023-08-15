@@ -12,9 +12,11 @@
 #include <faiss/gpu/utils/DeviceTensor.cuh>
 #include <faiss/gpu/utils/Float16.cuh>
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <thrust/execution_policy.h>
+#include <thrust/system/hip/detail/execution_policy.h>
 #include <thrust/transform.h>
+#include <thrust/system/hip/detail/transform.h>
 
 namespace faiss { namespace gpu {
 
@@ -102,13 +104,13 @@ template <typename From, typename To>
 void runConvert(const From* in,
                 To* out,
                 size_t num,
-                cudaStream_t stream) {
-  thrust::transform(thrust::cuda::par.on(stream),
-                    in, in + num, out, Convert<From, To>());
+                hipStream_t stream) {
+thrust::transform(thrust::hip::par.on(stream),
+                  in, in + num, out, Convert<From, To>());
 }
 
 template <typename From, typename To, int Dim>
-void convertTensor(cudaStream_t stream,
+void convertTensor(hipStream_t stream,
                    Tensor<From, Dim, true>& in,
                    Tensor<To, Dim, true>& out) {
   FAISS_ASSERT(in.numElements() == out.numElements());
@@ -118,7 +120,7 @@ void convertTensor(cudaStream_t stream,
 
 template <typename From, typename To, int Dim>
 DeviceTensor<To, Dim, true> convertTensor(GpuResources* res,
-                                          cudaStream_t stream,
+                                          hipStream_t stream,
                                           Tensor<From, Dim, true>& in) {
   DeviceTensor<To, Dim, true> out;
 

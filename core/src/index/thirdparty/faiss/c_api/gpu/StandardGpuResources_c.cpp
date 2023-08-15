@@ -41,7 +41,7 @@ int faiss_StandardGpuResources_setPinnedMemory(FaissStandardGpuResources* res, s
     } CATCH_AND_HANDLE
 }
 
-int faiss_StandardGpuResources_setDefaultStream(FaissStandardGpuResources* res, int device, cudaStream_t stream) {
+int faiss_StandardGpuResources_setDefaultStream(FaissStandardGpuResources* res, int device, hipStream_t stream) {
     try {
         reinterpret_cast<StandardGpuResources*>(res)->setDefaultStream(device, stream);
     } CATCH_AND_HANDLE

@@ -23,7 +23,8 @@
 
 #ifdef MILVUS_GPU_VERSION
 
-#include <nvml.h>
+#include <hip/hip_runtime.h>
+#include <rocm_smi/rocm_smi.h>
 
 #endif
 
@@ -67,20 +68,25 @@ SystemInfo::Init() {
     }
 
 #ifdef MILVUS_GPU_VERSION
-    // initialize GPU information
-    nvmlReturn_t nvmlresult;
-    nvmlresult = nvmlInit();
-    fiu_do_on("SystemInfo.Init.nvmInit_fail", nvmlresult = NVML_ERROR_NOT_FOUND);
-    if (NVML_SUCCESS != nvmlresult) {
-        LOG_SERVER_ERROR_ << "System information initilization failed";
-        return;
-    }
-    nvmlresult = nvmlDeviceGetCount(&num_device_);
-    fiu_do_on("SystemInfo.Init.nvm_getDevice_fail", nvmlresult = NVML_ERROR_NOT_FOUND);
-    if (NVML_SUCCESS != nvmlresult) {
-        LOG_SERVER_ERROR_ << "Unable to get devidce number";
-        return;
-    }
+hipError_t hip_result;
+rsmi_status_t rocm_smi_result;
+
+// Initialize GPU information
+rocm_smi_result = rsmi_init(0);
+fiu_do_on("SystemInfo.Init.rocsmi_init_fail", rocm_smi_result = HSA_STATUS_ERROR);
+if (rocm_smi_result != RSMI_STATUS_SUCCESS) {
+    LOG_SERVER_ERROR_ << "System information initialization failed";
+    return;
+}
+
+int deviceCount = 0;
+auto result = hipGetDeviceCount(&deviceCount);
+fiu_do_on("SystemInfo.Init.rocsmi_device_get_count_fail", result = HSA_STATUS_ERROR);
+if (result != hipSuccess) {
+    LOG_SERVER_ERROR_ << "Unable to get device number";
+    return;
+}
+num_device_ = deviceCount;
 #endif
 
     // initialize network traffic information
@@ -253,12 +259,15 @@ SystemInfo::GPUMemoryTotal() {
     std::vector<int64_t> result;
 
 #ifdef MILVUS_GPU_VERSION
-    nvmlMemory_t nvmlMemory;
+    hipError_t hip_result;
     for (uint32_t i = 0; i < num_device_; ++i) {
-        nvmlDevice_t device;
-        nvmlDeviceGetHandleByIndex(i, &device);
-        nvmlDeviceGetMemoryInfo(device, &nvmlMemory);
-        result.push_back(nvmlMemory.total);
+        hipDeviceProp_t deviceProp;
+        hip_result = hipGetDeviceProperties(&deviceProp, i);
+        if (hip_result != hipSuccess) {
+            LOG_SERVER_ERROR_ << "Failed to get device properties for device " << i;
+            continue;
+        }
+        result.push_back(deviceProp.totalGlobalMem);
     }
 #endif
 
@@ -273,13 +282,15 @@ SystemInfo::GPUTemperature() {
     std::vector<int64_t> result;
 
 #ifdef MILVUS_GPU_VERSION
-    for (uint32_t i = 0; i < num_device_; i++) {
-        nvmlDevice_t device;
-        nvmlDeviceGetHandleByIndex(i, &device);
-        unsigned int temp;
-        nvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &temp);
-        result.push_back(temp);
-    }
+// TODO: HADI "Failed to get temperature for the device"
+
+    // for (uint32_t i = 0; i < num_device_; i++) {
+    //     nvmlDevice_t device;
+    //     nvmlDeviceGetHandleByIndex(i, &device);
+    //     unsigned int temp;
+    //     nvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &temp);
+    //     result.push_back(temp);
+    // }
 #endif
 
     return result;
@@ -341,12 +352,16 @@ SystemInfo::GPUMemoryUsed() {
     std::vector<int64_t> result;
 
 #ifdef MILVUS_GPU_VERSION
-    nvmlMemory_t nvmlMemory;
+    hipError_t hip_result;
     for (uint32_t i = 0; i < num_device_; ++i) {
-        nvmlDevice_t device;
-        nvmlDeviceGetHandleByIndex(i, &device);
-        nvmlDeviceGetMemoryInfo(device, &nvmlMemory);
-        result.push_back(nvmlMemory.used);
+        size_t memory_used, memory_total;
+        hip_result = hipMemGetInfo(&memory_used, &memory_total);
+        if (hip_result != hipSuccess) {
+            LOG_SERVER_ERROR_ << "Failed to get GPU memory info for device " << i;
+            continue;
+        }
+
+        result.push_back(memory_used);
     }
 #endif
 

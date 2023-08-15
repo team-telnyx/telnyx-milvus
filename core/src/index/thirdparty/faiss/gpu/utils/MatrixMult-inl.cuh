@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cublas_v2.h>
+#include <hipblas/hipblas.h>
 #include <faiss/gpu/utils/Tensor.cuh>
 #include <faiss/gpu/utils/DeviceTensor.cuh>
 #include <faiss/gpu/utils/HostTensor.cuh>
@@ -19,23 +19,23 @@ namespace faiss { namespace gpu {
 class DeviceMemory;
 
 template <typename T>
-struct GetCudaType;
+struct GetHipType;
 
 template <>
-struct GetCudaType<float> {
-  static constexpr cudaDataType_t Type = CUDA_R_32F;
+struct GetHipType<float> {
+  static constexpr hipblasDatatype_t Type = HIPBLAS_R_32F;
 };
 
 template <>
-struct GetCudaType<half> {
-  static constexpr cudaDataType_t Type = CUDA_R_16F;
+struct GetHipType<half> {
+  static constexpr hipblasDatatype_t Type = HIPBLAS_R_16F;
 };
 
 template <typename AT, typename BT>
-cublasStatus_t
-rawGemm(cublasHandle_t handle,
-        cublasOperation_t transa,
-        cublasOperation_t transb,
+hipblasStatus_t
+rawGemm(hipblasHandle_t  handle,
+        hipblasOperation_t transa,
+        hipblasOperation_t transb,
         int m,
         int n,
         int k,
@@ -47,15 +47,21 @@ rawGemm(cublasHandle_t handle,
         const float fBeta,
         float *C,
         int ldc) {
-  auto cAT = GetCudaType<AT>::Type;
-  auto cBT = GetCudaType<BT>::Type;
+  auto cAT = GetHipType<AT>::Type;
+  auto cBT = GetHipType<BT>::Type;
 
   // Always accumulate in f32
-  return cublasSgemmEx(handle, transa, transb, m, n, k,
-                       &fAlpha, A, cAT, lda,
-                       B, cBT, ldb,
-                       &fBeta,
-                       C, CUDA_R_32F, ldc);
+  // TODO: HADI They are not equivalent. just for the sake of compilation:
+  // return cublasSgemmEx(handle, transa, transb, m, n, k,
+  //                      &fAlpha, A, cAT, lda,
+  //                      B, cBT, ldb,
+  //                      &fBeta,
+  //                      C, HIPBLAS_R_32F, ldc);
+  return hipblasSgemm(handle, transa, transb, m, n, k,
+                      &fAlpha, A, lda,
+                      B, ldb,
+                      &fBeta,
+                      C, ldc);
 }
 
 template <typename AT, typename BT>
@@ -65,9 +71,9 @@ runMatrixMult(Tensor<float, 2, true>& c, bool transC,
               Tensor<BT, 2, true>& b, bool transB,
               float alpha,
               float beta,
-              cublasHandle_t handle,
-              cudaStream_t stream) {
-  cublasSetStream(handle, stream);
+              hipblasHandle_t handle,
+              hipStream_t stream) {
+  hipblasSetStream(handle, stream);
 
   // Check that we have (m x k) * (k x n) = (m x n)
   // using the input row-major layout
@@ -100,15 +106,15 @@ runMatrixMult(Tensor<float, 2, true>& c, bool transC,
   int ldb = transC ? b.getStride(0) : a.getStride(0);
   int ldc = c.getStride(0);
 
-  auto gemmTrA = transB ? CUBLAS_OP_T : CUBLAS_OP_N;
-  auto gemmTrB = transA ? CUBLAS_OP_T : CUBLAS_OP_N;
+  auto gemmTrA = transB ? HIPBLAS_OP_T : HIPBLAS_OP_N;
+  auto gemmTrB = transA ? HIPBLAS_OP_T : HIPBLAS_OP_N;
 
   if (transC) {
-    gemmTrA = transA ? CUBLAS_OP_N : CUBLAS_OP_T;
-    gemmTrB = transB ? CUBLAS_OP_N : CUBLAS_OP_T;
+    gemmTrA = transA ? HIPBLAS_OP_N : HIPBLAS_OP_T;
+    gemmTrB = transB ? HIPBLAS_OP_N : HIPBLAS_OP_T;
   }
 
-  cublasStatus_t err;
+  hipblasStatus_t err;
 
   if (transC) {
     err = rawGemm(handle,
@@ -124,14 +130,14 @@ runMatrixMult(Tensor<float, 2, true>& c, bool transC,
                   pC, ldc);
   }
 
-  FAISS_ASSERT_FMT(err == CUBLAS_STATUS_SUCCESS,
+  FAISS_ASSERT_FMT(err == HIPBLAS_STATUS_SUCCESS,
                    "cublas failed (%d): "
                    "(%d, %d)%s x (%d, %d)%s = (%d, %d)%s",
                    (int) err,
                    a.getSize(0), a.getSize(1), transA ? "'" : "",
                    b.getSize(0), b.getSize(1), transB ? "'" : "",
                    c.getSize(0), c.getSize(1), transC ? "'" : "");
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 }
 
 template <typename AT, typename BT>
@@ -140,8 +146,8 @@ void runIteratedMatrixMult(Tensor<float, 3, true>& c, bool transC,
                            Tensor<BT, 3, true>& b, bool transB,
                            float alpha,
                            float beta,
-                           cublasHandle_t handle,
-                           cudaStream_t stream) {
+                           hipblasHandle_t handle,
+                           hipStream_t stream) {
   FAISS_ASSERT(c.getSize(0) == a.getSize(0));
   FAISS_ASSERT(a.getSize(0) == b.getSize(0));
 

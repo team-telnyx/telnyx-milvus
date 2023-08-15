@@ -2,10 +2,10 @@ if (KNOWHERE_GPU_VERSION)
 
     include_directories(${INDEX_SOURCE_DIR}/thirdparty)
     include_directories(${INDEX_SOURCE_DIR}/include)
-    include_directories(/usr/local/cuda/include)
+    include_directories(/opt/rocm-5.3.0/hip/include)
     include_directories(/usr/local/hdf5/include)
 
-    link_directories(/usr/local/cuda/lib64)
+    link_directories(/opt/rocm-5.3.0/hip/lib)
     link_directories(/usr/local/hdf5/lib)
 
     set(unittest_libs
@@ -32,15 +32,17 @@ if (KNOWHERE_GPU_VERSION)
     set(basic_libs
             gomp gfortran pthread
             )
-
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    set(cuda_lib
-            cudart
-            cublas
+    
+    find_package(HIPToolkit REQUIRED)
+    include_directories(${HIP_INCLUDE_DIRS})
+    link_directories("${HIP_ROOT_DIR}/lib")
+    set(hip_lib
+            ${ROCM_PATH}/lib/librocm_smi64.so
+            HIP::hiprt
+            hipblas
             )
     set(basic_libs ${basic_libs}
-            ${cuda_lib}
+            ${hip_lib}
             )
 
     add_executable(test_faiss_benchmark faiss_benchmark_test.cpp)

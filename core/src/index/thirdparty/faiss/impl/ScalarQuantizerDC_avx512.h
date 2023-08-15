@@ -10,7 +10,7 @@
 #pragma once
 
 #include <vector>
-#include <faiss/impl/ScalarQuantizer.h>
+#include "ScalarQuantizer.h"
 #include <faiss/impl/ScalarQuantizerOp.h>
 #include <faiss/MetricType.h>
 

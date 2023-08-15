@@ -34,9 +34,9 @@ macro(build_dependency DEPENDENCY_NAME)
     elseif ("${DEPENDENCY_NAME}" STREQUAL "OpenBLAS")
         build_openblas()
     elseif ("${DEPENDENCY_NAME}" STREQUAL "FAISS")
-        build_faiss()
+        # build_faiss()
     elseif ("${DEPENDENCY_NAME}" STREQUAL "MKL")
-        build_mkl()
+        # build_mkl()
     else ()
         message(FATAL_ERROR "Unknown thirdparty dependency to build: ${DEPENDENCY_NAME}")
     endif ()
@@ -534,13 +534,13 @@ macro(build_faiss)
 
     if (KNOWHERE_GPU_VERSION)
         set(FAISS_CONFIGURE_ARGS ${FAISS_CONFIGURE_ARGS}
-                "--with-cuda=${CUDA_TOOLKIT_ROOT_DIR}"
-                "--with-cuda-arch=-gencode=arch=compute_60,code=sm_60 -gencode=arch=compute_61,code=sm_61 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75"
+            "--with-hip=${HIP_ROOT_DIR}"
+            "--with-hip-arch=gfx900;gfx906;gfx908;gfx1030"
                 )
     else ()
         set(FAISS_CONFIGURE_ARGS ${FAISS_CONFIGURE_ARGS}
                 "CPPFLAGS=-DUSE_CPU"
-                --without-cuda)
+                --without-hip)
     endif ()
 
     message(STATUS "Building FAISS with configure args -${FAISS_CONFIGURE_ARGS}")
@@ -552,8 +552,7 @@ macro(build_faiss)
                 ${FAISS_SOURCE_URL}
                 ${EP_LOG_OPTIONS}
                 CONFIGURE_COMMAND
-                "./configure"
-                ${FAISS_CONFIGURE_ARGS}
+                ""
                 BUILD_COMMAND
                 ${MAKE} ${MAKE_BUILD_ARGS} all
                 BUILD_IN_SOURCE
@@ -569,9 +568,6 @@ macro(build_faiss)
                 SOURCE_DIR
                 ${FAISS_SOURCE_DIR}
                 ${EP_LOG_OPTIONS}
-                CONFIGURE_COMMAND
-                "./configure"
-                ${FAISS_CONFIGURE_ARGS}
                 BUILD_COMMAND
                 ${MAKE} ${MAKE_BUILD_ARGS} all
                 BUILD_IN_SOURCE
@@ -620,8 +616,19 @@ if (KNOWHERE_WITH_FAISS AND NOT TARGET faiss_ep)
         message("faiss with no mkl")
     endif ()
 
-    resolve_dependency(FAISS)
-    get_target_property(FAISS_INCLUDE_DIR faiss INTERFACE_INCLUDE_DIRECTORIES)
+    # resolve_dependency(FAISS)
+    # Find the Faiss package
+    # find_package(faiss REQUIRED)
+    # message(FATAL_ERROR "${FAISS_INCLUDE_DIR} <<<<<<<<<< FAISS")
+    # get_target_property(FAISS_INCLUDE_DIR faiss INTERFACE_INCLUDE_DIRECTORIES)
+    
+    set(FAISS_PREFIX "${INDEX_BINARY_DIR}/faiss_ep-prefix/src/faiss_ep")
+    set(FAISS_INCLUDE_DIR "${FAISS_PREFIX}/include")
+    set(FAISS_STATIC_LIB
+            "${FAISS_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}faiss${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
     include_directories(SYSTEM "${FAISS_INCLUDE_DIR}")
+    # include_directories(SYSTEM "/usr/local/include/faiss/")
     link_directories(SYSTEM ${FAISS_PREFIX}/lib/)
+    # link_directories(SYSTEM "/usr/local/lib/")
 endif ()

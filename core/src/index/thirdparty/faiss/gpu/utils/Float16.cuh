@@ -8,27 +8,29 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <faiss/gpu/GpuResources.h>
 #include <faiss/gpu/utils/DeviceTensor.cuh>
 
-// We require at least CUDA 8.0 for compilation
-#if CUDA_VERSION < 8000
-#error "CUDA >= 8.0 is required"
-#endif
+// TODO: HADI We assume that HIP_VERSION >= 3.9
+// // We require at least CUDA 8.0 for compilation
+// #if CUDA_VERSION < 8000
+// #error "CUDA >= 8.0 is required"
+// #endif
 
 // Some compute capabilities have full float16 ALUs.
-#if __CUDA_ARCH__ >= 530
+// #if defined(__HIP_PLATFORM_HCC__) && (__HIP_DEVICE_ARCH_MAJOR__ >= 9)
 #define FAISS_USE_FULL_FLOAT16 1
-#endif // __CUDA_ARCH__ types
+// #endif // __HIP_DEVICE_ARCH_MAJOR__ types
 
-#ifdef FAISS_USE_FLOAT16
-#include <cuda_fp16.h>
-#endif
+
+// #ifdef FAISS_USE_FLOAT16
+#include <hip/hip_fp16.h>
+// #endif
 
 namespace faiss { namespace gpu {
 
-#ifdef FAISS_USE_FLOAT16
+// #ifdef FAISS_USE_FLOAT16
 
 // 64 bytes containing 4 half (float16) values
 struct Half4 {
@@ -76,6 +78,6 @@ bool getDeviceSupportsFloat16Math(int device);
 
 __half hostFloat2Half(float v);
 
-#endif // FAISS_USE_FLOAT16
+// #endif // FAISS_USE_FLOAT16
 
 } } // namespace

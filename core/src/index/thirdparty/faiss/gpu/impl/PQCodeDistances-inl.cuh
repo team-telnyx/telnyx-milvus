@@ -305,7 +305,7 @@ runResidualVector(Tensor<float, 3, true>& pqCentroids,
                   Tensor<CentroidT, 2, true>& coarseCentroids,
                   Tensor<int, 2, true>& topQueryToCentroid,
                   Tensor<float, 4, true>& residual,
-                  cudaStream_t stream) {
+                  hipStream_t stream) {
   auto grid =
     dim3(topQueryToCentroid.getSize(0), topQueryToCentroid.getSize(1));
   auto block = dim3(std::min(queries.getSize(1), getMaxThreadsCurrentDevice()));
@@ -314,7 +314,7 @@ runResidualVector(Tensor<float, 3, true>& pqCentroids,
     queries, coarseCentroids, topQueryToCentroid, pqCentroids.getSize(1),
     residual);
 
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 }
 
 template <typename CentroidT>
@@ -326,8 +326,8 @@ runPQCodeDistancesMM(Tensor<float, 3, true>& pqCentroids,
                      NoTypeTensor<4, true>& outCodeDistances,
                      bool useFloat16Lookup,
                      DeviceMemory& mem,
-                     cublasHandle_t handle,
-                     cudaStream_t stream) {
+                     hipblasHandle_t handle,
+                     hipStream_t stream) {
   // Calculate (q - c) residual vector
   // (sub q)(query id)(centroid id)(sub dim)
   DeviceTensor<float, 4, true> residual(
@@ -463,7 +463,7 @@ runPQCodeDistances(Tensor<float, 3, true>& pqCentroids,
                    NoTypeTensor<4, true>& outCodeDistances,
                    bool l2Distance,
                    bool useFloat16Lookup,
-                   cudaStream_t stream) {
+                   hipStream_t stream) {
   const auto numSubQuantizers = pqCentroids.getSize(0);
   const auto dimsPerSubQuantizer = pqCentroids.getSize(1);
   const auto codesPerSubQuantizer = pqCentroids.getSize(2);
@@ -573,7 +573,7 @@ runPQCodeDistances(Tensor<float, 3, true>& pqCentroids,
 #undef RUN_CODE
 #undef CODE_L2
 
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 }
 
 } } // namespace

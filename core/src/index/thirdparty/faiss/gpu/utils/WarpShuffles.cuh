@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <faiss/gpu/utils/DeviceDefs.cuh>
 
 namespace faiss { namespace gpu {

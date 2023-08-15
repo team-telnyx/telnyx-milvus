@@ -443,7 +443,7 @@ macro(build_mysqlpp)
 
     externalproject_add(mysqlpp_ep
             URL
-            ${MYSQLPP_SOURCE_URL}
+            "/usr/local/mysql/mysql++-3.2.4.tar.gz"
             ${EP_LOG_OPTIONS}
             CONFIGURE_COMMAND
             "./configure"
@@ -882,18 +882,17 @@ macro(build_opentracing)
             -DBUILD_SHARED_LIBS=OFF)
 
     externalproject_add(opentracing_ep
-            URL
-            ${OPENTRACING_SOURCE_URL}
-            ${EP_LOG_OPTIONS}
-            CMAKE_ARGS
+        URL ${OPENTRACING_SOURCE_URL}
+        ${EP_LOG_OPTIONS}
+        CMAKE_ARGS
+            -DCMAKE_C_COMPILER=gcc
+            -DCMAKE_CXX_COMPILER=g++
             ${OPENTRACING_CMAKE_ARGS}
-            BUILD_COMMAND
-            ${MAKE}
-            ${MAKE_BUILD_ARGS}
-            BUILD_BYPRODUCTS
+        BUILD_COMMAND ${MAKE} ${MAKE_BUILD_ARGS}
+        BUILD_BYPRODUCTS
             ${OPENTRACING_STATIC_LIB}
             ${OPENTRACING_MOCK_TRACER_STATIC_LIB}
-            )
+    )
 
     file(MAKE_DIRECTORY "${OPENTRACING_INCLUDE_DIR}")
     add_library(opentracing STATIC IMPORTED)

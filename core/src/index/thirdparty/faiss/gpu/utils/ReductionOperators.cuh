@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 #include <faiss/gpu/utils/Limits.cuh>
 #include <faiss/gpu/utils/MathOperators.cuh>
 #include <faiss/gpu/utils/Pair.cuh>

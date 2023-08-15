@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #include <string>
 
 namespace faiss { namespace gpu {
@@ -20,7 +20,7 @@ class DeviceMemoryReservation {
   DeviceMemoryReservation();
   DeviceMemoryReservation(DeviceMemory* state,
                           int device, void* p, size_t size,
-                          cudaStream_t stream);
+                          hipStream_t stream);
   DeviceMemoryReservation(DeviceMemoryReservation&& m) noexcept;
   ~DeviceMemoryReservation();
 
@@ -29,7 +29,7 @@ class DeviceMemoryReservation {
   int device() { return device_; }
   void* get() { return data_; }
   size_t size() { return size_; }
-  cudaStream_t stream() { return stream_; }
+  hipStream_t stream() { return stream_; }
 
  private:
   DeviceMemory* state_;
@@ -37,7 +37,7 @@ class DeviceMemoryReservation {
   int device_;
   void* data_;
   size_t size_;
-  cudaStream_t stream_;
+  hipStream_t stream_;
 };
 
 /// Manages temporary memory allocations on a GPU device
@@ -50,18 +50,18 @@ class DeviceMemory {
 
   /// Obtains a temporary memory allocation for our device,
   /// whose usage is ordered with respect to the given stream.
-  virtual DeviceMemoryReservation getMemory(cudaStream_t stream,
+  virtual DeviceMemoryReservation getMemory(hipStream_t stream,
                                             size_t size) = 0;
 
-  /// Returns the current size available without calling cudaMalloc
+  /// Returns the current size available without calling hipMalloc
   virtual size_t getSizeAvailable() const = 0;
 
   /// Returns a string containing our current memory manager state
   virtual std::string toString() const = 0;
 
-  /// Returns the high-water mark of cudaMalloc allocations for our
+  /// Returns the high-water mark of hipMalloc allocations for our
   /// device
-  virtual size_t getHighWaterCudaMalloc() const = 0;
+  virtual size_t getHighWaterHipMalloc() const = 0;
 
  protected:
   friend class DeviceMemoryReservation;

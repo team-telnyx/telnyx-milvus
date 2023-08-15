@@ -29,17 +29,17 @@ class StackDeviceMemory : public DeviceMemory {
   ~StackDeviceMemory() override;
 
   /// Enable or disable the warning about not having enough temporary memory
-  /// when cudaMalloc gets called
-  void setCudaMallocWarning(bool b);
+  /// when hipMalloc gets called
+  void setHipMallocWarning(bool b);
 
   int getDevice() const override;
 
-  DeviceMemoryReservation getMemory(cudaStream_t stream,
+  DeviceMemoryReservation getMemory(hipStream_t stream,
                                     size_t size) override;
 
   size_t getSizeAvailable() const override;
   std::string toString() const override;
-  size_t getHighWaterCudaMalloc() const override;
+  size_t getHighWaterHipMalloc() const override;
 
  protected:
   void returnAllocation(DeviceMemoryReservation& m) override;
@@ -48,18 +48,18 @@ class StackDeviceMemory : public DeviceMemory {
   /// Previous allocation ranges and the streams for which
   /// synchronization is required
   struct Range {
-    inline Range(char* s, char* e, cudaStream_t str) :
+    inline Range(char* s, char* e, hipStream_t str) :
         start_(s), end_(e), stream_(str) {
     }
 
     // References a memory range [start, end)
     char* start_;
     char* end_;
-    cudaStream_t stream_;
+    hipStream_t stream_;
   };
 
   struct Stack {
-    /// Constructor that allocates memory via cudaMalloc
+    /// Constructor that allocates memory via hipMalloc
     Stack(int device, size_t size);
 
     /// Constructor that references a pre-allocated region of memory
@@ -67,21 +67,21 @@ class StackDeviceMemory : public DeviceMemory {
     ~Stack();
 
     /// Returns how much size is available for an allocation without
-    /// calling cudaMalloc
+    /// calling hipMalloc
     size_t getSizeAvailable() const;
 
     /// Obtains an allocation; all allocations are guaranteed to be 16
     /// byte aligned
-    char* getAlloc(size_t size, cudaStream_t stream);
+    char* getAlloc(size_t size, hipStream_t stream);
 
     /// Returns an allocation
-    void returnAlloc(char* p, size_t size, cudaStream_t stream);
+    void returnAlloc(char* p, size_t size, hipStream_t stream);
 
     /// Returns the stack state
     std::string toString() const;
 
-    /// Returns the high-water mark of cudaMalloc activity
-    size_t getHighWaterCudaMalloc() const;
+    /// Returns the high-water mark of hipMalloc activity
+    size_t getHighWaterHipMalloc() const;
 
     /// Device this allocation is on
     int device_;
@@ -104,7 +104,7 @@ class StackDeviceMemory : public DeviceMemory {
     /// possible synchronization purposes
     std::list<Range> lastUsers_;
 
-    /// How much cudaMalloc memory is currently outstanding?
+    /// How much hipMalloc memory is currently outstanding?
     size_t mallocCurrent_;
 
     /// What's the high water mark in terms of memory used from the
@@ -112,11 +112,11 @@ class StackDeviceMemory : public DeviceMemory {
     size_t highWaterMemoryUsed_;
 
     /// What's the high water mark in terms of memory allocated via
-    /// cudaMalloc?
+    /// hipMalloc?
     size_t highWaterMalloc_;
 
-    /// Whether or not a warning upon cudaMalloc is generated
-    bool cudaMallocWarning_;
+    /// Whether or not a warning upon hipMalloc is generated
+    bool hipMallocWarning_;
   };
 
   /// Our device

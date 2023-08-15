@@ -116,7 +116,7 @@ template <typename T, int Dim, bool InnerContig,
 __host__
 HostTensor<T, Dim, InnerContig, IndexT, PtrTraits>::HostTensor(
   Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-  cudaStream_t stream) :
+  hipStream_t stream) :
     Tensor<T, Dim, InnerContig, IndexT, PtrTraits>(nullptr, t.sizes(), t.strides()),
     state_(AllocState::Owner) {
   // Only contiguous arrays handled for now

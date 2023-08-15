@@ -43,7 +43,7 @@ struct MockIndex : public faiss::Index {
               const float* x,
               idx_t k,
               float* distances,
-              idx_t* labels) const override {
+              idx_t* labels) const {
     nCalled = n;
     xCalled = x;
     kCalled = k;

@@ -7,8 +7,8 @@
 
 // -*- c++ -*-
 
-#include <faiss/Clustering.h>
-#include <faiss/impl/AuxIndexStructures.h>
+#include "faiss/Clustering.h"
+#include "faiss/impl/AuxIndexStructures.h"
 
 #include <cmath>
 #include <cstdio>

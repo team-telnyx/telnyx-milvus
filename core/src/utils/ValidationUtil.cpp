@@ -22,7 +22,7 @@
 
 #ifdef MILVUS_GPU_VERSION
 
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 
 #endif
 
@@ -493,11 +493,11 @@ Status
 ValidationUtil::ValidateGpuIndex(int32_t gpu_index) {
 #ifdef MILVUS_GPU_VERSION
     int num_devices = 0;
-    auto cuda_err = cudaGetDeviceCount(&num_devices);
-    fiu_do_on("ValidationUtil.ValidateGpuIndex.get_device_count_fail", cuda_err = cudaError::cudaErrorUnknown);
+    auto hip_err = hipGetDeviceCount(&num_devices);
+    fiu_do_on("ValidationUtil.ValidateGpuIndex.get_device_count_fail", hip_err = cudaError::cudaErrorUnknown);
 
-    if (cuda_err != cudaSuccess) {
-        std::string msg = "Failed to get gpu card number, cuda error:" + std::to_string(cuda_err);
+    if (hip_err != hipSuccess) {
+        std::string msg = "Failed to get gpu card number, cuda error:" + std::to_string(hip_err);
         LOG_SERVER_ERROR_ << msg;
         return Status(SERVER_UNEXPECTED_ERROR, msg);
     }
@@ -518,11 +518,11 @@ Status
 ValidationUtil::GetGpuMemory(int32_t gpu_index, int64_t& memory) {
     fiu_return_on("ValidationUtil.GetGpuMemory.return_error", Status(SERVER_UNEXPECTED_ERROR, ""));
 
-    cudaDeviceProp deviceProp;
-    auto cuda_err = cudaGetDeviceProperties(&deviceProp, gpu_index);
-    if (cuda_err) {
+    hipDeviceProp_t deviceProp;
+    auto hip_err = hipGetDeviceProperties(&deviceProp, gpu_index);
+    if (hip_err) {
         std::string msg = "Failed to get gpu properties for gpu" + std::to_string(gpu_index) +
-                          " , cuda error:" + std::to_string(cuda_err);
+                          " , hip error:" + std::to_string(hip_err);
         LOG_SERVER_ERROR_ << msg;
         return Status(SERVER_UNEXPECTED_ERROR, msg);
     }

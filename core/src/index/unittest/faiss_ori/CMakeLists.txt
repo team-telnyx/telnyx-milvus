@@ -28,15 +28,17 @@ if (KNOWHERE_GPU_VERSION)
     set(basic_libs
             gomp gfortran pthread
             )
-
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    set(cuda_lib
-            cudart
-            cublas
+            
+    find_package(HIPToolkit REQUIRED)
+    include_directories(${HIP_INCLUDE_DIRS})
+    link_directories("${HIP_ROOT_DIR}/lib")
+    set(hip_lib
+            ${ROCM_PATH}/lib/librocm_smi64.so
+            HIP::hiprt
+            hipblas
             )
     set(basic_libs ${basic_libs}
-            ${cuda_lib}
+            ${hip_lib}
             )
 
     #<GPU-TEST>

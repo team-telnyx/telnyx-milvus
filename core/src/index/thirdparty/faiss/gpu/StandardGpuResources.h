@@ -25,7 +25,7 @@ class StandardGpuResources : public GpuResources {
   ~StandardGpuResources() override;
 
   /// Disable allocation of temporary memory; all temporary memory
-  /// requests will call cudaMalloc / cudaFree at the point of use
+  /// requests will call hipMalloc / hipFree at the point of use
   void noTempMemory();
 
   /// Specify that we wish to use a certain fixed size of memory on
@@ -40,15 +40,15 @@ class StandardGpuResources : public GpuResources {
   void setPinnedMemory(size_t size);
 
   /// Called to change the stream for work ordering
-  void setDefaultStream(int device, cudaStream_t stream);
+  void setDefaultStream(int device, hipStream_t stream);
 
   /// Called to change the work ordering streams to the null stream
   /// for all devices
   void setDefaultNullStreamAllDevices();
 
   /// Enable or disable the warning about not having enough temporary memory
-  /// when cudaMalloc gets called
-  void setCudaMallocWarning(bool b);
+  /// when hipMalloc gets called
+  void setHipMallocWarning(bool b);
 
  public:
   /// Internal system calls
@@ -56,17 +56,17 @@ class StandardGpuResources : public GpuResources {
   /// Initialize resources for this device
   void initializeForDevice(int device) override;
 
-  cublasHandle_t getBlasHandle(int device) override;
+  hipblasHandle_t getBlasHandle(int device) override;
 
-  cudaStream_t getDefaultStream(int device) override;
+  hipStream_t getDefaultStream(int device) override;
 
-  std::vector<cudaStream_t> getAlternateStreams(int device) override;
+  std::vector<hipStream_t> getAlternateStreams(int device) override;
 
   DeviceMemory& getMemoryManager(int device) override;
 
   std::pair<void*, size_t> getPinnedMemory() override;
 
-  cudaStream_t getAsyncCopyStream(int device) override;
+  hipStream_t getAsyncCopyStream(int device) override;
 
  private:
   /// Have GPU resources been initialized for this device yet?
@@ -78,20 +78,20 @@ class StandardGpuResources : public GpuResources {
 
  private:
   /// Our default stream that work is ordered on, one per each device
-  std::unordered_map<int, cudaStream_t> defaultStreams_;
+  std::unordered_map<int, hipStream_t> defaultStreams_;
 
   /// This contains particular streams as set by the user for
   /// ordering, if any
-  std::unordered_map<int, cudaStream_t> userDefaultStreams_;
+  std::unordered_map<int, hipStream_t> userDefaultStreams_;
 
   /// Other streams we can use, per each device
-  std::unordered_map<int, std::vector<cudaStream_t> > alternateStreams_;
+  std::unordered_map<int, std::vector<hipStream_t> > alternateStreams_;
 
   /// Async copy stream to use for GPU <-> CPU pinned memory copies
-  std::unordered_map<int, cudaStream_t> asyncCopyStreams_;
+  std::unordered_map<int, hipStream_t> asyncCopyStreams_;
 
   /// cuBLAS handle for each device
-  std::unordered_map<int, cublasHandle_t> blasHandles_;
+  std::unordered_map<int, hipblasHandle_t> blasHandles_;
 
   /// Temporary memory provider, per each device
   std::unordered_map<int, std::unique_ptr<StackDeviceMemory> > memory_;
@@ -107,8 +107,8 @@ class StandardGpuResources : public GpuResources {
   /// Amount of pinned memory we should allocate
   size_t pinnedMemSize_;
 
-  /// Whether or not a warning upon cudaMalloc is generated
-  bool cudaMallocWarning_;
+  /// Whether or not a warning upon hipMalloc is generated
+  bool hipMallocWarning_;
 };
 
 } } // namespace

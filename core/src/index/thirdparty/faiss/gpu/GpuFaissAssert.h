@@ -10,7 +10,7 @@
 #define GPU_FAISS_ASSERT_INCLUDED
 
 #include <faiss/impl/FaissAssert.h>
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
 ///
 /// Assertions

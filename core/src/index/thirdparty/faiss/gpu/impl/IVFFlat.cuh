@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <hip/hip_runtime.h>
 #include <faiss/gpu/impl/IVFBase.cuh>
 #include <faiss/gpu/impl/GpuScalarQuantizer.cuh>
 

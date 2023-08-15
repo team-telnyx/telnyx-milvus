@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <string>
 
-#include <faiss/utils/Heap.h>
+#include "Heap.h"
 
 
 namespace faiss {

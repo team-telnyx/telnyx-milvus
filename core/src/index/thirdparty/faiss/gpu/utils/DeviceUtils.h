@@ -9,8 +9,8 @@
 #pragma once
 
 #include <faiss/impl/FaissAssert.h>
-#include <cuda_runtime.h>
-#include <cublas_v2.h>
+#include <hip/hip_runtime.h>
+#include <hipblas/hipblas.h>
 #include <vector>
 
 namespace faiss { namespace gpu {
@@ -24,21 +24,21 @@ void setCurrentDevice(int device);
 /// Returns the number of available GPU devices
 int getNumDevices();
 
-/// Starts the CUDA profiler (exposed via SWIG)
+/// Starts the HIP profiler (exposed via SWIG)
 void profilerStart();
 
-/// Stops the CUDA profiler (exposed via SWIG)
+/// Stops the HIP profiler (exposed via SWIG)
 void profilerStop();
 
 /// Synchronizes the CPU against all devices (equivalent to
-/// cudaDeviceSynchronize for each device)
+/// hipDeviceSynchronize for each device)
 void synchronizeAllDevices();
 
-/// Returns a cached cudaDeviceProp for the given device
-const cudaDeviceProp& getDeviceProperties(int device);
+/// Returns a cached hipDeviceProp for the given device
+const hipDeviceProp_t& getDeviceProperties(int device);
 
-/// Returns the cached cudaDeviceProp for the current device
-const cudaDeviceProp& getCurrentDeviceProperties();
+/// Returns the cached hipDeviceProp for the current device
+const hipDeviceProp_t& getCurrentDeviceProperties();
 
 /// Returns the maximum number of threads available for the given GPU
 /// device
@@ -70,9 +70,9 @@ bool getTensorCoreSupport(int device);
 /// Equivalent to getTensorCoreSupport(getCurrentDevice())
 bool getTensorCoreSupportCurrentDevice();
 
-/// Returns the maximum k-selection value supported based on the CUDA SDK that
+/// Returns the maximum k-selection value supported based on the HIP SDK that
 /// we were compiled with. .cu files can use DeviceDefs.cuh, but this is for
-/// non-CUDA files
+/// non-HIP files
 int getMaxKSelection();
 
 /// RAII object to set the current device, and restore the previous
@@ -86,62 +86,62 @@ class DeviceScope {
   int prevDevice_;
 };
 
-/// RAII object to manage a cublasHandle_t
-class CublasHandleScope {
+/// RAII object to manage a hipblasHandle_t
+class HipblasHandleScope {
  public:
-  CublasHandleScope();
-  ~CublasHandleScope();
+  HipblasHandleScope();
+  ~HipblasHandleScope();
 
-  cublasHandle_t get() { return blasHandle_; }
+  hipblasHandle_t get() { return blasHandle_; }
 
  private:
-  cublasHandle_t blasHandle_;
+  hipblasHandle_t blasHandle_;
 };
 
-// RAII object to manage a cudaEvent_t
-class CudaEvent {
+// RAII object to manage a hipEvent_t
+class HipEvent {
  public:
   /// Creates an event and records it in this stream
-  explicit CudaEvent(cudaStream_t stream);
-  CudaEvent(const CudaEvent& event) = delete;
-  CudaEvent(CudaEvent&& event) noexcept;
-  ~CudaEvent();
+  explicit HipEvent(hipStream_t stream);
+  HipEvent(const HipEvent& event) = delete;
+  HipEvent(HipEvent&& event) noexcept;
+  ~HipEvent();
 
-  inline cudaEvent_t get() { return event_; }
+  inline hipEvent_t get() { return event_; }
 
   /// Wait on this event in this stream
-  void streamWaitOnEvent(cudaStream_t stream);
+  void streamWaitOnEvent(hipStream_t stream);
 
   /// Have the CPU wait for the completion of this event
   void cpuWaitOnEvent();
 
-  CudaEvent& operator=(CudaEvent&& event) noexcept;
-  CudaEvent& operator=(CudaEvent& event) = delete;
+  HipEvent& operator=(HipEvent&& event) noexcept;
+  HipEvent& operator=(HipEvent& event) = delete;
 
  private:
-  cudaEvent_t event_;
+  hipEvent_t event_;
 };
 
-/// Wrapper to test return status of CUDA functions
-#define CUDA_VERIFY(X)                                                  \
+/// Wrapper to test return status of HIP functions
+#define HIP_VERIFY(X)                                                  \
   do {                                                                  \
     auto err__ = (X);                                                   \
-    FAISS_ASSERT_FMT(err__ == cudaSuccess, "CUDA error %d %s",          \
-                     (int) err__, cudaGetErrorString(err__));           \
+    FAISS_ASSERT_FMT(err__ == hipSuccess, "HIP error %d %s",          \
+                     (int) err__, hipGetErrorString(err__));           \
   } while (0)
 
-/// Wrapper to synchronously probe for CUDA errors
+/// Wrapper to synchronously probe for HIP errors
 // #define FAISS_GPU_SYNC_ERROR 1
 
 #ifdef FAISS_GPU_SYNC_ERROR
-#define CUDA_TEST_ERROR()                       \
+#define HIP_TEST_ERROR()                       \
   do {                                          \
-    CUDA_VERIFY(cudaDeviceSynchronize());       \
+    HIP_VERIFY(hipDeviceSynchronize());       \
   } while (0)
 #else
-#define CUDA_TEST_ERROR()                       \
+#define HIP_TEST_ERROR()                       \
   do {                                          \
-    CUDA_VERIFY(cudaGetLastError());            \
+    HIP_VERIFY(hipGetLastError());            \
   } while (0)
 #endif
 
@@ -149,23 +149,23 @@ class CudaEvent {
 template <typename L1, typename L2>
 void streamWaitBase(const L1& listWaiting, const L2& listWaitOn) {
   // For all the streams we are waiting on, create an event
-  std::vector<cudaEvent_t> events;
+  std::vector<hipEvent_t> events;
   for (auto& stream : listWaitOn) {
-    cudaEvent_t event;
-    CUDA_VERIFY(cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
-    CUDA_VERIFY(cudaEventRecord(event, stream));
+    hipEvent_t event;
+    HIP_VERIFY(hipEventCreateWithFlags(&event, hipEventDisableTiming));
+    HIP_VERIFY(hipEventRecord(event, stream));
     events.push_back(event);
   }
 
   // For all the streams that are waiting, issue a wait
   for (auto& stream : listWaiting) {
     for (auto& event : events) {
-      CUDA_VERIFY(cudaStreamWaitEvent(stream, event, 0));
+      HIP_VERIFY(hipStreamWaitEvent(stream, event, 0));
     }
   }
 
   for (auto& event : events) {
-    CUDA_VERIFY(cudaEventDestroy(event));
+    HIP_VERIFY(hipEventDestroy(event));
   }
 }
 
@@ -173,18 +173,18 @@ void streamWaitBase(const L1& listWaiting, const L2& listWaitOn) {
 /// otherwise {...} doesn't have a type
 template <typename L1>
 void streamWait(const L1& a,
-                const std::initializer_list<cudaStream_t>& b) {
+                const std::initializer_list<hipStream_t>& b) {
   streamWaitBase(a, b);
 }
 
 template <typename L2>
-void streamWait(const std::initializer_list<cudaStream_t>& a,
+void streamWait(const std::initializer_list<hipStream_t>& a,
                 const L2& b) {
   streamWaitBase(a, b);
 }
 
-inline void streamWait(const std::initializer_list<cudaStream_t>& a,
-                       const std::initializer_list<cudaStream_t>& b) {
+inline void streamWait(const std::initializer_list<hipStream_t>& a,
+                       const std::initializer_list<hipStream_t>& b) {
   streamWaitBase(a, b);
 }
 

@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
   HostTensor<float, 2, true> gpuDistances({numQueries, FLAGS_k});
   HostTensor<faiss::Index::idx_t, 2, true> gpuIndices({numQueries, FLAGS_k});
 
-  CUDA_VERIFY(cudaProfilerStart());
+  HIP_VERIFY(cudaProfilerStart());
   faiss::gpu::synchronizeAllDevices();
 
   float gpuTime = 0.0f;
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     gpuTime = timer.elapsedMilliseconds();
   }
 
-  CUDA_VERIFY(cudaProfilerStop());
+  HIP_VERIFY(cudaProfilerStop());
   printf("GPU time %.3f ms\n", gpuTime);
 
   compareLists(cpuDistances.data(), cpuIndices.data(),
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
                numQueries, FLAGS_k,
                "", true, FLAGS_diff, false);
 
-  CUDA_VERIFY(cudaDeviceSynchronize());
+  HIP_VERIFY(cudaDeviceSynchronize());
   // printf("\ncudaMalloc usage %zd\n",
   //        resources.getMemoryManager().getHighWaterCudaMalloc());
 

@@ -13,14 +13,16 @@
 #include <faiss/gpu/utils/DeviceDefs.cuh>
 #include <faiss/gpu/utils/DeviceUtils.h>
 #include <faiss/gpu/utils/Select.cuh>
-#include <faiss/gpu/utils/BlockSelectKernel.cuh>
+#include <faiss/gpu/utils/BlockSelectKernel.h>
 
 #include <memory>
 #include <algorithm>
 #include <thrust/fill.h>
 #include <thrust/for_each.h>
 #include <thrust/device_ptr.h>
-#include <thrust/execution_policy.h>
+
+// // #include <thrust/execution_policy.h>
+// #include <thrust/system/hip/detail/execution_policy.h>
 #include <iostream>
 
 //
@@ -235,7 +237,7 @@ void runGeneralDistanceKernel(Tensor<T, 2, InnerContig>& vecs,
                               Tensor<T, 2, InnerContig>& query,
                               Tensor<float, 2, true>& out,
                               const DistanceOp& op,
-                              cudaStream_t stream) {
+                              hipStream_t stream) {
   FAISS_ASSERT(vecs.getSize(1) == query.getSize(1));
   FAISS_ASSERT(out.getSize(0) == query.getSize(0));
   FAISS_ASSERT(out.getSize(1) == vecs.getSize(0));
@@ -277,11 +279,11 @@ void runGeneralDistance(GpuResources* resources,
 
   // If we're quering against a 0 sized set, just return empty results
   if (centroids.numElements() == 0) {
-    thrust::fill(thrust::cuda::par.on(defaultStream),
+    thrust::fill(thrust::hip::par.on(defaultStream),
                  outDistances.data(), outDistances.end(),
                  Limits<T>::getMax());
 
-    thrust::fill(thrust::cuda::par.on(defaultStream),
+    thrust::fill(thrust::hip::par.on(defaultStream),
                  outIndices.data(), outIndices.end(),
                  -1);
 
@@ -426,7 +428,7 @@ void runGeneralDistance(GpuResources* resources,
     FAISS_THROW_MSG("interrupted");
   }
 
-  CUDA_TEST_ERROR();
+  HIP_TEST_ERROR();
 }
 
 } } // namespace

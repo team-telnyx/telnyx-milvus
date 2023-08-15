@@ -57,7 +57,7 @@ class HostTensor : public Tensor<T, Dim, InnerContig, IndexT, PtrTraits> {
   /// locally. If the tensor is on the GPU, then we will copy it to
   /// ourselves wrt the given stream.
   __host__ HostTensor(Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-                      cudaStream_t stream);
+                      hipStream_t stream);
 
   /// Call to zero out memory
   __host__ HostTensor<T, Dim, InnerContig, IndexT, PtrTraits>& zero();
@@ -75,7 +75,7 @@ class HostTensor : public Tensor<T, Dim, InnerContig, IndexT, PtrTraits> {
  private:
   enum AllocState {
     /// This tensor itself owns the memory, which must be freed via
-    /// cudaFree
+    /// hipFree
     Owner,
 
     /// This tensor itself is not an owner of the memory; there is

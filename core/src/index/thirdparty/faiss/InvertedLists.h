@@ -17,7 +17,7 @@
 
 #include <memory>
 #include <vector>
-#include <faiss/Index.h>
+#include "faiss/Index.h"
 
 #ifndef USE_CPU
 namespace faiss {

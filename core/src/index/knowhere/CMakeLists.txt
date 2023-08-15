@@ -1,3 +1,8 @@
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../src)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../thirdparty)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake_build/fiu_ep-prefix/src/fiu_ep/include)
+
 include_directories(${INDEX_SOURCE_DIR}/knowhere)
 include_directories(${INDEX_SOURCE_DIR}/thirdparty)
 include_directories(${INDEX_SOURCE_DIR}/thirdparty/SPTAG/AnnService)
@@ -16,9 +21,10 @@ file(GLOB SRC_FILES
         ${SPTAG_SOURCE_DIR}/AnnService/src/Core/KDT/*.cpp
         ${SPTAG_SOURCE_DIR}/AnnService/src/Helper/*.cpp)
 
-if (NOT TARGET SPTAGLibStatic)
-    add_library(SPTAGLibStatic STATIC ${SRC_FILES} ${HDR_FILES})
-endif ()
+find_library(SPTAGLibStatic libSPTAGLibStatic.a REQUIRED)
+if(NOT SPTAGLibStatic)
+        message(FATAL_ERROR "SPTAGLibStatic not found!!!!!!!!!!!!!")
+endif()
 
 set(external_srcs
         knowhere/common/Exception.cpp
@@ -54,9 +60,14 @@ set(index_srcs
         knowhere/index/vector_index/IndexAnnoy.cpp
         )
 
+find_library(FAISS_LIB faiss)
+if(NOT FAISS_LIB)
+        message(FATAL_ERROR "faiss library not found.")
+endif()
+        
 set(depend_libs
-        SPTAGLibStatic
-        faiss
+        ${SPTAGLibStatic}
+        ${FAISS_LIB}
         gomp
         gfortran
         pthread
@@ -90,15 +101,17 @@ if (MILVUS_FPGA_VERSION)
 
 endif ()
 
-if (KNOWHERE_GPU_VERSION)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    set(cuda_lib
-            cudart
-            cublas
+#if (KNOWHERE_GPU_VERSION)
+    find_package(HIPToolkit REQUIRED)
+    include_directories(${HIP_INCLUDE_DIRS})
+    link_directories("${HIP_ROOT_DIR}/lib")
+    set(hip_lib
+            ${ROCM_PATH}/lib/librocm_smi64.so
+            HIP::hiprt
+            hipblas
             )
     set(depend_libs ${depend_libs}
-            ${cuda_lib}
+            ${hip_lib}
             )
 
     set(index_srcs ${index_srcs}
@@ -111,15 +124,15 @@ if (KNOWHERE_GPU_VERSION)
             knowhere/index/vector_index/helpers/FaissGpuResourceMgr.cpp
             )
 
-endif ()
+#endif ()
 
-if (NOT TARGET knowhere)
+# if (NOT TARGET knowhere)
     add_library(
             knowhere STATIC
             ${external_srcs}
             ${index_srcs}
     )
-endif ()
+# endif ()
 
 target_link_libraries(
         knowhere

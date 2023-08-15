@@ -23,7 +23,7 @@ void runUpdateListPointers(Tensor<int, 1, true>& listIds,
                            thrust::device_vector<int>& listLengths,
                            thrust::device_vector<void*>& listCodes,
                            thrust::device_vector<void*>& listIndices,
-                           cudaStream_t stream);
+                           hipStream_t stream);
 
 /// Actually append the new codes / vector indices to the individual lists
 
@@ -35,7 +35,7 @@ void runIVFPQInvertedListAppend(Tensor<int, 1, true>& listIds,
                                 thrust::device_vector<void*>& listCodes,
                                 thrust::device_vector<void*>& listIndices,
                                 IndicesOptions indicesOptions,
-                                cudaStream_t stream);
+                                hipStream_t stream);
 
 /// IVF flat storage
 void runIVFFlatInvertedListAppend(Tensor<int, 1, true>& listIds,
@@ -48,6 +48,6 @@ void runIVFFlatInvertedListAppend(Tensor<int, 1, true>& listIds,
                                   thrust::device_vector<void*>& listData,
                                   thrust::device_vector<void*>& listIndices,
                                   IndicesOptions indicesOptions,
-                                  cudaStream_t stream);
+                                  hipStream_t stream);
 
 } } // namespace

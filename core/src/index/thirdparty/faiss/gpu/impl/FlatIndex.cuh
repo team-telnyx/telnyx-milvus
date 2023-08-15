@@ -36,7 +36,7 @@ class FlatIndex {
   int getDim() const;
 
   /// Reserve storage that can contain at least this many vectors
-  void reserve(size_t numVecs, cudaStream_t stream);
+  void reserve(size_t numVecs, hipStream_t stream);
 
   /// Returns the vectors based on the type desired; the FlatIndex must be of
   /// the same type (float16 or float32) to not assert
@@ -53,12 +53,12 @@ class FlatIndex {
 
   /// Performs a copy of the vectors on the given device, converting
   /// as needed from float16
-  DeviceTensor<float, 2, true> getVectorsFloat32Copy(cudaStream_t stream);
+  DeviceTensor<float, 2, true> getVectorsFloat32Copy(hipStream_t stream);
 
   /// Returns only a subset of the vectors
   DeviceTensor<float, 2, true> getVectorsFloat32Copy(int from,
                                                      int num,
-                                                     cudaStream_t stream);
+                                                     hipStream_t stream);
 
   void query(Tensor<float, 2, true>& vecs,
              Tensor<uint8_t, 1, true>& bitset,
@@ -108,7 +108,7 @@ class FlatIndex {
 
   /// Add vectors to ourselves; the pointer passed can be on the host
   /// or the device
-  void add(const float* data, int numVecs, cudaStream_t stream);
+  void add(const float* data, int numVecs, hipStream_t stream);
 
   /// Free all storage
   void reset();

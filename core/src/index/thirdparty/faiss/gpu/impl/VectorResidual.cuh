@@ -9,6 +9,7 @@
 #pragma once
 
 #include <faiss/gpu/utils/Tensor.cuh>
+#include <hip/hip_fp16.h>
 
 namespace faiss { namespace gpu {
 
@@ -17,25 +18,25 @@ void runCalcResidual(Tensor<float, 2, true>& vecs,
                      Tensor<float, 2, true>& centroids,
                      Tensor<int, 1, true>& vecToCentroid,
                      Tensor<float, 2, true>& residuals,
-                     cudaStream_t stream);
+                     hipStream_t stream);
 
 void runCalcResidual(Tensor<float, 2, true>& vecs,
                      Tensor<half, 2, true>& centroids,
                      Tensor<int, 1, true>& vecToCentroid,
                      Tensor<float, 2, true>& residuals,
-                     cudaStream_t stream);
+                     hipStream_t stream);
 
 // Gather vectors
 void runReconstruct(Tensor<int, 1, true>& listIds,
                     Tensor<float, 2, true>& vecs,
                     Tensor<float, 2, true>& out,
-                    cudaStream_t stream);
+                    hipStream_t stream);
 
 #ifdef FAISS_USE_FLOAT16
 void runReconstruct(Tensor<int, 1, true>& listIds,
                     Tensor<half, 2, true>& vecs,
                     Tensor<float, 2, true>& out,
-                    cudaStream_t stream);
+                    hipStream_t stream);
 # endif
 
 } } // namespace

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "hip/hip_runtime.h"
+
 #include <faiss/IndexScalarQuantizer.h>
 #include <faiss/gpu/utils/ConversionOperators.cuh>
 #include <faiss/gpu/utils/DeviceTensor.cuh>
@@ -39,7 +41,7 @@ struct GpuScalarQuantizer : public ScalarQuantizer {
 
     // Just use the default stream, as we're allocating memory above in any case
     gpuTrained.copyFrom(cpuTrained, 0);
-    CUDA_VERIFY(cudaStreamSynchronize(0));
+    HIP_VERIFY(hipStreamSynchronize(0));
   }
 
   // ScalarQuantizer::trained copied to GPU memory

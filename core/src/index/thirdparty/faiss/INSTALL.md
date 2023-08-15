@@ -224,7 +224,7 @@ The GPU version is a superset of the CPU version. In addition it
 requires the cuda compiler and related libraries (Cublas)
 
 The nvcc-specific flags to pass to the compiler, based on your desired
-compute capability can be customized by providing the `--with-cuda-arch` to
+compute capability can be customized by providing the `--with-hip-arch` to
 `./configure`. Only compute capability 3.5+ is supported. For example, we enable
 by default:
 

@@ -20,8 +20,8 @@ set(test_files
         ${CMAKE_CURRENT_SOURCE_DIR}/test_util.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 
-include_directories("${CUDA_TOOLKIT_ROOT_DIR}/include")
-link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
+include_directories("${HIP_ROOT_DIR}/include")
+link_directories("${HIP_ROOT_DIR}/lib")
 
 set(util_files
         ${MILVUS_ENGINE_SRC}/utils/StringHelpFunctions.cpp

@@ -13,7 +13,7 @@
 #include <faiss/gpu/utils/StaticUtils.h>
 #include <faiss/gpu/utils/WarpShuffles.cuh>
 #include <faiss/impl/FaissAssert.h>
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
 namespace faiss { namespace gpu {
 

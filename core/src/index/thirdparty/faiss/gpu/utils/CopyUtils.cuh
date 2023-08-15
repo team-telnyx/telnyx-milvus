@@ -16,13 +16,13 @@ namespace faiss { namespace gpu {
 /// Ensure the memory at `p` is either on the given device, or copy it
 /// to the device in a new allocation.
 /// If `resources` is provided, then we will perform a temporary
-/// memory allocation if needed. Otherwise, we will call cudaMalloc if
+/// memory allocation if needed. Otherwise, we will call hipMalloc if
 /// needed.
 template <typename T, int Dim>
 DeviceTensor<T, Dim, true> toDevice(GpuResources* resources,
                                     int dstDevice,
                                     T* src,
-                                    cudaStream_t stream,
+                                    hipStream_t stream,
                                     std::initializer_list<int> sizes) {
   int dev = getDeviceForAddress(src);
 
@@ -54,7 +54,7 @@ DeviceTensor<T, Dim, true> toDevice(GpuResources* resources,
 /// Copies data to the CPU, if it is not already on the CPU
 template <typename T, int Dim>
 HostTensor<T, Dim, true> toHost(T* src,
-                                cudaStream_t stream,
+                                hipStream_t stream,
                                 std::initializer_list<int> sizes) {
   int dev = getDeviceForAddress(src);
 
@@ -73,7 +73,7 @@ HostTensor<T, Dim, true> toHost(T* src,
 
 /// Copies a device array's allocation to an address, if necessary
 template <typename T>
-inline void fromDevice(T* src, T* dst, size_t num, cudaStream_t stream) {
+inline void fromDevice(T* src, T* dst, size_t num, hipStream_t stream) {
   // It is possible that the array already represents memory at `p`,
   // in which case no copy is needed
   if (src == dst) {
@@ -83,23 +83,23 @@ inline void fromDevice(T* src, T* dst, size_t num, cudaStream_t stream) {
   int dev = getDeviceForAddress(dst);
 
   if (dev == -1) {
-    CUDA_VERIFY(cudaMemcpyAsync(dst,
+    HIP_VERIFY(hipMemcpyAsync(dst,
                                 src,
                                 num * sizeof(T),
-                                cudaMemcpyDeviceToHost,
+                                hipMemcpyDeviceToHost,
                                 stream));
   } else {
-    CUDA_VERIFY(cudaMemcpyAsync(dst,
+    HIP_VERIFY(hipMemcpyAsync(dst,
                                 src,
                                 num * sizeof(T),
-                                cudaMemcpyDeviceToDevice,
+                                hipMemcpyDeviceToDevice,
                                 stream));
   }
 }
 
 /// Copies a device array's allocation to an address, if necessary
 template <typename T, int Dim>
-void fromDevice(Tensor<T, Dim, true>& src, T* dst, cudaStream_t stream) {
+void fromDevice(Tensor<T, Dim, true>& src, T* dst, hipStream_t stream) {
   FAISS_ASSERT(src.isContiguous());
   fromDevice(src.data(), dst, src.numElements(), stream);
 }

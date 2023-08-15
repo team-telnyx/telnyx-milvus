@@ -8,7 +8,7 @@
 // -*- c++ -*-
 
 #include <faiss/IndexHNSW.h>
-
+// #include <faiss/utils/sgemm.c>
 
 #include <cstdlib>
 #include <cassert>

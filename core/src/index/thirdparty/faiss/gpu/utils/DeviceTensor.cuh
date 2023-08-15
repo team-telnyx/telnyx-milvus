@@ -50,11 +50,11 @@ class DeviceTensor : public Tensor<T, Dim, InnerContig, IndexT, PtrTraits> {
   /// given stream.
   __host__ DeviceTensor(DeviceMemory& m,
                         const IndexT sizes[Dim],
-                        cudaStream_t stream,
+                        hipStream_t stream,
                         MemorySpace space = MemorySpace::Device);
   __host__ DeviceTensor(DeviceMemory& m,
                         std::initializer_list<IndexT> sizes,
-                        cudaStream_t stream,
+                        hipStream_t stream,
                         MemorySpace space = MemorySpace::Device);
 
   /// Constructs a tensor of the given size and stride, referencing a
@@ -75,24 +75,24 @@ class DeviceTensor : public Tensor<T, Dim, InnerContig, IndexT, PtrTraits> {
 
   /// Copies a tensor into ourselves, allocating memory for it locally
   __host__ DeviceTensor(Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-                        cudaStream_t stream,
+                        hipStream_t stream,
                         MemorySpace space = MemorySpace::Device);
 
   /// Copies a tensor into ourselves, reserving a temporary
   /// memory reservation via a memory manager.
   __host__ DeviceTensor(DeviceMemory& m,
                         Tensor<T, Dim, InnerContig, IndexT, PtrTraits>& t,
-                        cudaStream_t stream,
+                        hipStream_t stream,
                         MemorySpace space = MemorySpace::Device);
 
   /// Call to zero out memory
   __host__ DeviceTensor<T, Dim, InnerContig, IndexT, PtrTraits>&
-  zero(cudaStream_t stream);
+  zero(hipStream_t stream);
 
  private:
   enum AllocState {
     /// This tensor itself owns the memory, which must be freed via
-    /// cudaFree
+    /// hipFree
     Owner,
 
     /// This tensor itself is not an owner of the memory; there is

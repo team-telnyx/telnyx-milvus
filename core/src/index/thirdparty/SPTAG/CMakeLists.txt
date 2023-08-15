@@ -5,33 +5,33 @@ cmake_minimum_required (VERSION 3.12)
 
 project (SPTAGLib)
 
-function(CXX_COMPILER_DUMPVERSION _OUTPUT_VERSION)
-  exec_program(${CMAKE_CXX_COMPILER}
-    ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
-    OUTPUT_VARIABLE COMPILER_VERSION
-  )
+# function(CXX_COMPILER_DUMPVERSION _OUTPUT_VERSION)
+#   exec_program(${CMAKE_CXX_COMPILER}
+#     ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
+#     OUTPUT_VARIABLE COMPILER_VERSION
+#   )
 
-  set(${_OUTPUT_VERSION} ${COMPILER_VERSION} PARENT_SCOPE)
-endfunction()
+#   set(${_OUTPUT_VERSION} ${COMPILER_VERSION} PARENT_SCOPE)
+# endfunction()
 
-if(NOT WIN32)
-    CXX_COMPILER_DUMPVERSION(CXX_COMPILER_VERSION)
-endif()
+# if(NOT WIN32)
+#     CXX_COMPILER_DUMPVERSION(CXX_COMPILER_VERSION)
+# endif()
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    # require at least gcc 5.0
-    if (CXX_COMPILER_VERSION VERSION_LESS 5.0)
-        message(FATAL_ERROR "GCC version must be at least 5.0!")
-    endif()
-    set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Wunreachable-code -Wno-reorder -Wno-sign-compare -Wno-unknown-pragmas -Wcast-align -lm -lrt -DNDEBUG -std=c++14 -fopenmp -march=native")
-    set (CMAKE_CXX_FLAGS_DEBUG   "-Wall -Wunreachable-code -Wno-reorder -Wno-sign-compare -Wno-unknown-pragmas -Wcast-align -ggdb -lm -lrt -DNDEBUG -std=c++14 -fopenmp -march=native")
-elseif(WIN32)
-    if(NOT MSVC14)
-         message(FATAL_ERROR "On Windows, only MSVC version 14 are supported!") 
-    endif()
-else ()
-    message(FATAL_ERROR "Unrecognized compiler (use GCC or MSVC)!")
-endif()
+# if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+#     # require at least gcc 5.0
+#     if (CXX_COMPILER_VERSION VERSION_LESS 5.0)
+#         message(FATAL_ERROR "GCC version must be at least 5.0!")
+#     endif()
+#     set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Wunreachable-code -Wno-reorder -Wno-sign-compare -Wno-unknown-pragmas -Wcast-align -lm -lrt -DNDEBUG -std=c++14 -fopenmp -march=native")
+#     set (CMAKE_CXX_FLAGS_DEBUG   "-Wall -Wunreachable-code -Wno-reorder -Wno-sign-compare -Wno-unknown-pragmas -Wcast-align -ggdb -lm -lrt -DNDEBUG -std=c++14 -fopenmp -march=native")
+# elseif(WIN32)
+#     if(NOT MSVC14)
+#          message(FATAL_ERROR "On Windows, only MSVC version 14 are supported!") 
+#     endif()
+# else ()
+#     message(FATAL_ERROR "Unrecognized compiler (use GCC or MSVC)!")
+# endif()
 
 if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Release CACHE STRING "Build types: Release Debug" FORCE)

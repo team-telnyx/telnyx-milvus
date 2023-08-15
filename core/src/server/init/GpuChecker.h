@@ -15,8 +15,8 @@
 
 #include <string>
 
-#include <cuda_runtime.h>
-#include <nvml.h>
+#include <hip/hip_runtime.h>
+#include <rocm_smi/rocm_smi.h>
 
 #include "utils/Status.h"
 
@@ -30,23 +30,23 @@ extern const char* NVIDIA_MIN_DRIVER_VERSION;
 class GpuChecker {
  private:
     static std::string
-    NvmlErrorString(nvmlReturn_t error_no);
+    RsmiErrorString(rsmi_status_t error_no);
 
     static std::string
-    CudaErrorString(cudaError_t error_no);
+    HipErrorString(hipError_t error_no);
 
  private:
     static Status
-    GetGpuComputeCapacity(nvmlDevice_t device, int& major, int& minor);
+    GetGpuComputeCapacity(hipDevice_t device, int& major, int& minor);
 
     static Status
-    GetGpuNvidiaDriverVersion(std::string& version);
+    GetGpuAmdDriverVersion(std::string& version);
 
     static Status
-    GetGpuCudaDriverVersion(int& version);
+    GetGpuHipDriverVersion(int& version);
 
     static Status
-    GetGpuCudaRuntimeVersion(int& version);
+    GetGpuHipRuntimeVersion(int& version);
 
  public:
     static Status

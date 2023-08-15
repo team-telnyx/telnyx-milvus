@@ -8,21 +8,21 @@
 
 #pragma once
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
 namespace faiss { namespace gpu {
 
 __device__ __forceinline__
 unsigned int getBitfield(unsigned int val, int pos, int len) {
   unsigned int ret;
-  asm("bfe.u32 %0, %1, %2, %3;" : "=r"(ret) : "r"(val), "r"(pos), "r"(len));
+  asm volatile("v_bfe_u32 %0, %1, %2, %3;" : "=v"(ret) : "v"(val), "v"(pos), "v"(len));
   return ret;
 }
 
 __device__ __forceinline__
 unsigned long getBitfield(unsigned long val, int pos, int len) {
   unsigned long ret;
-  asm("bfe.u64 %0, %1, %2, %3;" : "=l"(ret) : "l"(val), "r"(pos), "r"(len));
+  asm("v_bfe_u32 %0, %1, %2, %3;" : "=v"(ret) : "v"(val), "v"(pos), "v"(len));
   return ret;
 }
 
@@ -33,12 +33,6 @@ unsigned int setBitfield(unsigned int val,
   asm("bfi.b32 %0, %1, %2, %3, %4;" :
       "=r"(ret) : "r"(toInsert), "r"(val), "r"(pos), "r"(len));
   return ret;
-}
-
-__device__ __forceinline__ int getLaneId() {
-  int laneId;
-  asm("mov.u32 %0, %laneid;" : "=r"(laneId) );
-  return laneId;
 }
 
 __device__ __forceinline__ unsigned getLaneMaskLt() {

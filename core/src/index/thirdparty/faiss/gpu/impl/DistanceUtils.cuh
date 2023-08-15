@@ -284,7 +284,7 @@ template <typename T>
 void runIncrementIndex(Tensor<T, 2, true>& indices,
                        int k,
                        int increment,
-                       cudaStream_t stream) {
+                       hipStream_t stream) {
   dim3 grid(indices.getSize(1) / k, indices.getSize(0));
   int block = std::min(k, 512);
 

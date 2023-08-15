@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <hip/hip_runtime.h>
 #include <faiss/MetricType.h>
 #include <faiss/gpu/GpuIndicesOptions.h>
 #include <faiss/gpu/utils/DeviceVector.cuh>
@@ -15,6 +16,7 @@
 #include <faiss/gpu/utils/MemorySpace.h>
 #include <memory>
 #include <thrust/device_vector.h>
+
 #include <vector>
 
 namespace faiss { namespace gpu {
@@ -71,12 +73,12 @@ class IVFBase {
   size_t reclaimMemory_(bool exact);
 
   /// Update all device-side list pointer and size information
-  void updateDeviceListInfo_(cudaStream_t stream);
+  void updateDeviceListInfo_(hipStream_t stream);
 
   /// For a set of list IDs, update device-side list pointer and size
   /// information
   void updateDeviceListInfo_(const std::vector<int>& listIds,
-                             cudaStream_t stream);
+                             hipStream_t stream);
 
   /// Shared function to copy indices from CPU to GPU
   void addIndicesFromCpu_(int listId,

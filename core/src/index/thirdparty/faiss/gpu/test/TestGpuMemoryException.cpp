@@ -21,7 +21,7 @@ TEST(TestGpuMemoryException, AddException) {
   size_t devFree = 0;
   size_t devTotal = 0;
 
-  CUDA_VERIFY(cudaMemGetInfo(&devFree, &devTotal));
+  HIP_VERIFY(cudaMemGetInfo(&devFree, &devTotal));
 
   // Figure out the dimensionality needed to get at least greater than devTotal
   size_t brokenAddDims = ((devTotal / sizeof(float)) / numBrokenAdd) + 1;

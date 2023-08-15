@@ -36,7 +36,7 @@ __global__ void warpSelect(Tensor<K, 2, true> in,
     return;
   }
 
-  int i = getLaneId();
+  int i = threadIdx.x % kWarpSize; //getLaneId();
   K* inStart = in[row][i].data();
 
   // Whole warps must participate in the selection
@@ -60,13 +60,13 @@ __global__ void warpSelect(Tensor<K, 2, true> in,
 void runWarpSelect(Tensor<float, 2, true>& in,
                    Tensor<float, 2, true>& outKeys,
                    Tensor<int, 2, true>& outIndices,
-                   bool dir, int k, cudaStream_t stream);
+                   bool dir, int k, hipStream_t stream);
 
 #ifdef FAISS_USE_FLOAT16
 void runWarpSelect(Tensor<half, 2, true>& in,
                    Tensor<half, 2, true>& outKeys,
                    Tensor<int, 2, true>& outIndices,
-                   bool dir, int k, cudaStream_t stream);
+                   bool dir, int k, hipStream_t stream);
 #endif
 
 } } // namespace

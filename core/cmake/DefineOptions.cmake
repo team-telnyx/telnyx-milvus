@@ -43,7 +43,7 @@ endmacro()
 #----------------------------------------------------------------------
 set_option_category("Milvus Build Option")
 
-define_option(MILVUS_GPU_VERSION "Build GPU version" OFF)
+define_option(MILVUS_GPU_VERSION "Build GPU version" ON)
 
 define_option(MILVUS_FPGA_VERSION "Build FPGA version" OFF)
 #----------------------------------------------------------------------

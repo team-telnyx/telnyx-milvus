@@ -22,14 +22,14 @@ int faiss_GpuResources_initializeForDevice(FaissGpuResources* res, int device) {
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getBlasHandle(FaissGpuResources* res, int device, cublasHandle_t* out) {
+int faiss_GpuResources_getBlasHandle(FaissGpuResources* res, int device, hipblasHandle_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getBlasHandle(device);
         *out = o;
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getDefaultStream(FaissGpuResources* res, int device, cudaStream_t* out) {
+int faiss_GpuResources_getDefaultStream(FaissGpuResources* res, int device, hipStream_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getDefaultStream(device);
         *out = o;
@@ -44,21 +44,21 @@ int faiss_GpuResources_getPinnedMemory(FaissGpuResources* res, void** p_buffer, 
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getAsyncCopyStream(FaissGpuResources* res, int device, cudaStream_t* out) {
+int faiss_GpuResources_getAsyncCopyStream(FaissGpuResources* res, int device, hipStream_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getAsyncCopyStream(device);
         *out = o;
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getBlasHandleCurrentDevice(FaissGpuResources* res, cublasHandle_t* out) {
+int faiss_GpuResources_getBlasHandleCurrentDevice(FaissGpuResources* res, hipblasHandle_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getBlasHandleCurrentDevice();
         *out = o;
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getDefaultStreamCurrentDevice(FaissGpuResources* res, cudaStream_t* out) {
+int faiss_GpuResources_getDefaultStreamCurrentDevice(FaissGpuResources* res, hipStream_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getDefaultStreamCurrentDevice();
         *out = o;
@@ -77,7 +77,7 @@ int faiss_GpuResources_syncDefaultStreamCurrentDevice(FaissGpuResources* res) {
     } CATCH_AND_HANDLE
 }
 
-int faiss_GpuResources_getAsyncCopyStreamCurrentDevice(FaissGpuResources* res, cudaStream_t* out) {
+int faiss_GpuResources_getAsyncCopyStreamCurrentDevice(FaissGpuResources* res, hipStream_t* out) {
     try {
         auto o = reinterpret_cast<GpuResources*>(res)->getAsyncCopyStreamCurrentDevice();
         *out = o;

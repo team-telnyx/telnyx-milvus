@@ -8,6 +8,7 @@
 // -*- c++ -*-
 
 #include <faiss/utils/utils.h>
+// #include <faiss/utils/sgemm.c>
 
 #include <cstdio>
 #include <cassert>

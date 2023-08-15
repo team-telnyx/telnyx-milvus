@@ -86,7 +86,7 @@ void runCalcListOffsets(Tensor<int, 2, true>& topQueryToCentroid,
                         thrust::device_vector<int>& listLengths,
                         Tensor<int, 2, true>& prefixSumOffsets,
                         Tensor<char, 1, true>& thrustMem,
-                        cudaStream_t stream);
+                        hipStream_t stream);
 
 /// Performs a first pass of k-selection on the results
 void runPass1SelectLists(thrust::device_vector<void*>& listIndices,
@@ -100,7 +100,7 @@ void runPass1SelectLists(thrust::device_vector<void*>& listIndices,
                          bool chooseLargest,
                          Tensor<float, 3, true>& heapDistances,
                          Tensor<int, 3, true>& heapIndices,
-                         cudaStream_t stream);
+                         hipStream_t stream);
 
 /// With min distance limit
 void runPass1SelectLists(Tensor<int, 2, true>& prefixSumOffsets,
@@ -111,7 +111,7 @@ void runPass1SelectLists(Tensor<int, 2, true>& prefixSumOffsets,
                          Tensor<float, 3, true>& heapDistances,
                          Tensor<int, 3, true>& heapIndices,
                          Tensor<float, 2, true>& minDistances,
-                         cudaStream_t stream);
+                         hipStream_t stream);
 
 /// Performs a final pass of k-selection on the results, producing the
 /// final indices
@@ -125,6 +125,6 @@ void runPass2SelectLists(Tensor<float, 2, true>& heapDistances,
                          bool chooseLargest,
                          Tensor<float, 2, true>& outDistances,
                          Tensor<long, 2, true>& outIndices,
-                         cudaStream_t stream);
+                         hipStream_t stream);
 
 } } // namespace

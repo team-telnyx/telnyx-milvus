@@ -8,7 +8,7 @@
 // -*- c++ -*-
 
 #include <faiss/impl/ProductQuantizer.h>
-
+// #include <faiss/utils/sgemm.c>
 
 #include <cstddef>
 #include <cstring>

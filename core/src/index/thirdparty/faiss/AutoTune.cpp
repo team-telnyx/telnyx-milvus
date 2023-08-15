@@ -11,12 +11,12 @@
  * implementation of Hyper-parameter auto-tuning
  */
 
-#include <faiss/AutoTune.h>
+#include "faiss/AutoTune.h"
 
 #include <cmath>
 
-#include <faiss/impl/FaissAssert.h>
-#include <faiss/utils/utils.h>
+#include "faiss/impl/FaissAssert.h"
+#include "faiss/utils/utils.h"
 #include <faiss/utils/random.h>
 
 #include <faiss/IndexFlat.h>

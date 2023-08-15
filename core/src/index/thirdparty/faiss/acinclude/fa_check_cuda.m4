@@ -1,67 +1,66 @@
-AC_DEFUN([FA_CHECK_CUDA], [
+AC_DEFUN([FA_CHECK_HIP], [
 
-AC_ARG_WITH(cuda,
-  [AS_HELP_STRING([--with-cuda=<prefix>], [prefix of the CUDA installation])])
-AC_ARG_WITH(cuda-arch,
-  [AS_HELP_STRING([--with-cuda-arch=<gencodes>], [device specific -gencode flags])],
+AC_ARG_WITH(hip,
+  [AS_HELP_STRING([--with-hip=<prefix>], [prefix of the HIP installation])])
+AC_ARG_WITH(hip-arch,
+  [AS_HELP_STRING([--with-hip-arch=<gencodes>], [device specific -gencode flags])],
   [],
-  [with_cuda_arch=default])
+  [with_hip_arch=default])
 
-if test x$with_cuda != xno; then
-  if test x$with_cuda != x; then
-    cuda_prefix=$with_cuda
-    AC_CHECK_PROG(NVCC, [nvcc], [$cuda_prefix/bin/nvcc], [], [$cuda_prefix/bin])
-    NVCC_CPPFLAGS="-I$cuda_prefix/include"
-    NVCC_LDFLAGS="-L$cuda_prefix/lib64"
+if test x$with_hip != xno; then
+  if test x$with_hip != x; then
+    hip_prefix=$with_hip
+    AC_CHECK_PROG(HIPCC, [hipcc], [$hip_prefix/bin/hipcc], [], [$hip_prefix/bin])
+    HIPCC_CPPFLAGS="-I$hip_prefix/include"
+    HIPCC_LDFLAGS="-L$hip_prefix/lib"
   else
-    AC_CHECK_PROGS(NVCC, [nvcc /usr/local/cuda/bin/nvcc], [])
-    if test "x$NVCC" == "x/usr/local/cuda/bin/nvcc"; then
-      cuda_prefix="/usr/local/cuda"
-      NVCC_CPPFLAGS="-I$cuda_prefix/include"
-      NVCC_LDFLAGS="-L$cuda_prefix/lib64"
+    AC_CHECK_PROGS(HIPCC, [hipcc /opt/rocm-5.3.0/hip/bin/hipcc], [])
+    if test "x$HIPCC" == "x/opt/rocm-5.3.0/hip/bin/hipcc"; then
+      hip_prefix="/opt/rocm-5.3.0/hip"
+      HIPCC_CPPFLAGS="-I$hip_prefix/include"
+      HIPCC_LDFLAGS="-L$hip_prefix/lib"
     else
-      cuda_prefix=""
-      NVCC_CPPFLAGS=""
-      NVCC_LDFLAGS=""
+      hip_prefix=""
+      HIPCC_CPPFLAGS=""
+      HIPCC_LDFLAGS=""
     fi
   fi
 
-  if test "x$NVCC" == x; then
-    AC_MSG_ERROR([Couldn't find nvcc])
+  if test "x$HIPCC" == x; then
+    AC_MSG_ERROR([Couldn't find hipcc])
   fi
 
-  if test "x$with_cuda_arch" == xdefault; then
-    with_cuda_arch="-gencode=arch=compute_35,code=compute_35 \\
--gencode=arch=compute_52,code=compute_52 \\
--gencode=arch=compute_60,code=compute_60 \\
--gencode=arch=compute_61,code=compute_61 \\
--gencode=arch=compute_70,code=compute_70 \\
--gencode=arch=compute_75,code=compute_75"
-  fi
+if test "x$with_hip_arch" == xdefault; then
+  with_hip_arch="-gencode=arch=gfx900,code=sm_60 \
+  -gencode=arch=gfx906,code=sm_61 \
+  -gencode=arch=gfx908,code=sm_70 \
+  -gencode=arch=gfx1030,code=sm_75"
+fi
 
   fa_save_CPPFLAGS="$CPPFLAGS"
   fa_save_LDFLAGS="$LDFLAGS"
   fa_save_LIBS="$LIBS"
 
-  CPPFLAGS="$NVCC_CPPFLAGS $CPPFLAGS"
-  LDFLAGS="$NVCC_LDFLAGS $LDFLAGS"
+  CPPFLAGS="$HIPCC_CPPFLAGS $CPPFLAGS"
+  LDFLAGS="$HIPCC_LDFLAGS $LDFLAGS"
 
-  AC_CHECK_HEADER([cuda.h], [], AC_MSG_FAILURE([Couldn't find cuda.h]))
-  AC_CHECK_LIB([cublas], [cublasAlloc], [], AC_MSG_FAILURE([Couldn't find libcublas]))
-  AC_CHECK_LIB([cudart], [cudaSetDevice], [], AC_MSG_FAILURE([Couldn't find libcudart]))
+AC_CHECK_HEADER([hip/hip_runtime.h], [], AC_MSG_FAILURE([Couldn't find hip/hip_runtime.h]))
+AC_CHECK_LIB([hipblas], [hipblasAlloc], [], AC_MSG_FAILURE([Couldn't find libhipblas]))
+AC_CHECK_LIB([hip_runtime], [hipSetDevice], [], AC_MSG_FAILURE([Couldn't find libhip_runtime]))
 
-  NVCC_LIBS="$LIBS"
-  NVCC_CPPFLAGS="$CPPFLAGS"
-  NVCC_LDFLAGS="$LDFLAGS"
+
+  HIPCC_LIBS="$LIBS"
+  HIPCC_CPPFLAGS="$CPPFLAGS"
+  HIPCC_LDFLAGS="$LDFLAGS"
   CPPFLAGS="$fa_save_CPPFLAGS"
   LDFLAGS="$fa_save_LDFLAGS"
   LIBS="$fa_save_LIBS"
 fi
 
-AC_SUBST(NVCC)
-AC_SUBST(NVCC_CPPFLAGS)
-AC_SUBST(NVCC_LDFLAGS)
-AC_SUBST(NVCC_LIBS)
-AC_SUBST(CUDA_PREFIX, $cuda_prefix)
-AC_SUBST(CUDA_ARCH, $with_cuda_arch)
+AC_SUBST(HIPCC)
+AC_SUBST(HIPCC_CPPFLAGS)
+AC_SUBST(HIPCC_LDFLAGS)
+AC_SUBST(HIPCC_LIBS)
+AC_SUBST(HIP_PREFIX, $hip_prefix)
+AC_SUBST(HIP_ARCH, $with_hip_arch)
 ])

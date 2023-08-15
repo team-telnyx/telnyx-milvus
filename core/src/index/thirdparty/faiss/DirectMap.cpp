@@ -7,13 +7,13 @@
 
 // -*- c++ -*-
 
-#include <faiss/DirectMap.h>
+#include "faiss/DirectMap.h"
 
 #include <cstdio>
 #include <cassert>
 
-#include <faiss/impl/FaissAssert.h>
-#include <faiss/impl/AuxIndexStructures.h>
+#include "faiss/impl/FaissAssert.h"
+#include "impl/AuxIndexStructures.h"
 
 namespace faiss {
 

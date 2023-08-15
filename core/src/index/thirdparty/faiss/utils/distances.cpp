@@ -8,6 +8,7 @@
 // -*- c++ -*-
 
 #include <faiss/utils/distances.h>
+// #include <faiss/utils/sgemm.c>
 
 #include <cstdio>
 #include <cassert>
