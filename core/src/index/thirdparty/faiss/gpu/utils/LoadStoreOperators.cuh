@@ -34,7 +34,7 @@ struct LoadStore {
     *((T*) p) = v;
   }
 };
-
+/* TODO: HADI
 #ifdef FAISS_USE_FLOAT16
 
 template <>
@@ -90,5 +90,5 @@ struct LoadStore<Half8> {
 };
 
 #endif
-
+*/
 } } // namespace

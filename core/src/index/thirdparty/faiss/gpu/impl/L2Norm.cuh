@@ -9,6 +9,7 @@
 #pragma once
 
 #include <faiss/gpu/utils/Tensor.cuh>
+#include <faiss/gpu/utils/Float16.cuh>
 
 namespace faiss { namespace gpu {
 

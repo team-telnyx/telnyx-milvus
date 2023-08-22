@@ -188,39 +188,31 @@ void runBinaryDistanceAnySize(Tensor<BinaryType, 2, true>& vecs,
   dim3 block(kLanes, kWarps);
 
   if (k == 1) {
-    binaryDistanceAnySize<1, 1, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<1, 1, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 32) {
-    binaryDistanceAnySize<32, 2, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<32, 2, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);  
   } else if (k <= 64) {
-    binaryDistanceAnySize<64, 3, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<64, 3, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);    
   } else if (k <= 128) {
-    binaryDistanceAnySize<128, 3, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<128, 3, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k); 
   } else if (k <= 256) {
-    binaryDistanceAnySize<256, 4, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<256, 4, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k); 
   } else if (k <= 512) {
-    binaryDistanceAnySize<512, 8, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<512, 8, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 1024) {
-    binaryDistanceAnySize<1024, 8, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<1024, 8, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   }
 #if GPU_MAX_SELECTION_K >= 2048
   else if (k <= 2048) {
-    binaryDistanceAnySize<2048, 8, BinaryType>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceAnySize<2048, 8, BinaryType>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   }
 #endif
 }
@@ -235,39 +227,31 @@ void runBinaryDistanceLimitSize(Tensor<BinaryType, 2, true>& vecs,
   dim3 block(kLanes, kWarps);
 
   if (k == 1) {
-    binaryDistanceLimitSize<1, 1, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<1, 1, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 32) {
-    binaryDistanceLimitSize<32, 2, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<32, 2, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 64) {
-    binaryDistanceLimitSize<64, 3, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<64, 2, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 128) {
-    binaryDistanceLimitSize<128, 3, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<128, 3, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 256) {
-    binaryDistanceLimitSize<256, 4, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<256, 4, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 512) {
-    binaryDistanceLimitSize<512, 8, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<512, 8, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   } else if (k <= 1024) {
-    binaryDistanceLimitSize<1024, 8, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<1024, 8, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   }
 #if GPU_MAX_SELECTION_K >= 2048
   else if (k <= 2048) {
-    binaryDistanceLimitSize<2048, 8, BinaryType, ReductionLimit>
-      <<<grid, block, 0, stream>>>(
-      vecs, query, outK, outV, k);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(binaryDistanceLimitSize<2048, 8, BinaryType, ReductionLimit>), 
+      grid, block, 0, stream, vecs, query, outK, outV, k);
   }
 #endif
 }

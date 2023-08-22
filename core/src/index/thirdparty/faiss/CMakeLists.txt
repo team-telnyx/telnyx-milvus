@@ -10,14 +10,16 @@ file(GLOB FAISS_SRC "*.cpp" "impl/*.cpp" "utils/*.cpp")
 # Export FAISS_HEADERS variable to parent scope.
 set(FAISS_HEADERS ${FAISS_HEADERS} PARENT_SCOPE)
 
-add_library(faiss ${FAISS_SRC})
+add_library(faiss STATIC ${FAISS_SRC})
 
 add_library(faiss_avx2 ${FAISS_SRC})
 if(NOT FAISS_OPT_LEVEL STREQUAL "avx2")
   set_target_properties(faiss_avx2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 if(NOT WIN32)
-  target_compile_options(faiss_avx2 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-msse3 -mavx2 -mfma -mf16c -mpopcnt>)
+  target_compile_options(faiss_avx2 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-mavx2 -mfma -mf16c -mpopcnt>)
+
+  # target_compile_options(faiss_avx2 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-msse3 -mavx2 -mfma -mf16c -mpopcnt>)
 else()
   # MSVC enables FMA with /arch:AVX2; no separate flags for F16C, POPCNT
   # Ref. FMA (under /arch:AVX2): https://docs.microsoft.com/en-us/cpp/build/reference/arch-x64
@@ -50,7 +52,9 @@ if(WIN32)
 endif()
 
 target_compile_definitions(faiss PRIVATE FINTEGER=int)
+target_compile_definitions(faiss PRIVATE FAISS_USE_FLOAT16=FALSE)
 target_compile_definitions(faiss_avx2 PRIVATE FINTEGER=int)
+target_compile_definitions(faiss_avx2 PRIVATE FAISS_USE_FLOAT16=FALSE)
 
 find_package(OpenMP REQUIRED)
 target_link_libraries(faiss PRIVATE OpenMP::OpenMP_CXX)
@@ -73,6 +77,8 @@ else()
   target_link_libraries(faiss PUBLIC ${LAPACK_LIB}) 
   target_link_libraries(faiss_avx2 PUBLIC ${LAPACK_LIB}) 
 endif()
+
+# add_subdirectory(gpu/test)
 
 install(TARGETS faiss
   EXPORT faiss-targets

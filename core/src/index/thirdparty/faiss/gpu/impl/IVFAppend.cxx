@@ -52,7 +52,7 @@ runUpdateListPointers(Tensor<int, 1, true>& listIds,
   dim3 grid(numBlocks);
   dim3 block(numThreads);
 
-  runUpdateListPointers<<<grid, block, 0, stream>>>(
+  hipLaunchKernelGGL(runUpdateListPointers, grid, block, 0, stream, 
     listIds, newListLength, newCodePointers, newIndexPointers,
     listLengths.data().get(),
     listCodes.data().get(),
@@ -125,7 +125,7 @@ runIVFPQInvertedListAppend(Tensor<int, 1, true>& listIds,
 
 #define RUN_APPEND(IND)                                         \
   do {                                                          \
-    ivfpqInvertedListAppend<IND><<<grid, block, 0, stream>>>(   \
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(ivfpqInvertedListAppend<IND>), grid, block, 0, stream, \
       listIds, listOffset, encodings, indices,                  \
       listCodes.data().get(),                                   \
       listIndices.data().get());                                \
@@ -258,7 +258,7 @@ runIVFFlatInvertedListAppend(Tensor<int, 1, true>& listIds,
   if (indicesOptions != INDICES_CPU && indicesOptions != INDICES_IVF) {
     int blocks = utils::divUp(vecs.getSize(0), maxThreads);
 
-    ivfFlatIndicesAppend<<<blocks, maxThreads, 0, stream>>>(
+    hipLaunchKernelGGL(ivfFlatIndicesAppend, dim3(blocks), dim3(maxThreads), 0, stream, 
       listIds,
       listOffset,
       indices,
@@ -272,8 +272,7 @@ runIVFFlatInvertedListAppend(Tensor<int, 1, true>& listIds,
     dim3 grid(vecs.getSize(0));                                         \
     dim3 block(std::min(dim / codec.kDimPerIter, maxThreads));          \
                                                                         \
-    ivfFlatInvertedListAppend                                           \
-      <<<grid, block, 0, stream>>>(                                     \
+    hipLaunchKernelGGL(ivfFlatInvertedListAppend, grid, block, 0, stream, \
         listIds,                                                        \
         listOffset,                                                     \
         useResidual ? residuals : vecs,                                 \

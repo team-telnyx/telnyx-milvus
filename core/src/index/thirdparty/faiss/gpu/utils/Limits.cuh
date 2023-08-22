@@ -34,7 +34,7 @@ struct Limits<float> {
 };
 
 inline __device__ __host__ half kGetHalf(unsigned short v) {
-#if FAISS_USE_FULL_FLOAT16
+#if defined(__HIPCC__)
   __half_raw h;
   h.x = v;
   return __half(h);
@@ -42,7 +42,7 @@ inline __device__ __host__ half kGetHalf(unsigned short v) {
   half h;
   h.x = v;
   return h;
-#endif
+#endif // __HIPCC__
 }
 
 template <>

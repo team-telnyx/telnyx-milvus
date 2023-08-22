@@ -267,8 +267,8 @@ runMultiPassTile(Tensor<float, 2, true>& queries,
       auto precompTerm2T = precompTerm2.toTensor<LOOKUP_T>();           \
       auto precompTerm3T = precompTerm3.toTensor<LOOKUP_T>();           \
                                                                         \
-      pqScanPrecomputedMultiPass<NUM_SUB_Q, LOOKUP_T, LOOKUP_VEC_T>     \
-        <<<grid, block, smem, stream>>>(                                \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(pqScanPrecomputedMultiPass<NUM_SUB_Q, LOOKUP_T, LOOKUP_VEC_T>), \
+          grid, block, smem, stream,                                    \
           queries,                                                      \
           precompTerm1,                                                 \
           precompTerm2T,                                                \

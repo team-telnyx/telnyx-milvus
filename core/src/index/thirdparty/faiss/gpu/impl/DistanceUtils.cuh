@@ -291,7 +291,8 @@ void runIncrementIndex(Tensor<T, 2, true>& indices,
   // should be exact
   FAISS_ASSERT(grid.x * k == indices.getSize(1));
 
-  incrementIndex<<<grid, block, 0, stream>>>(indices, k, increment);
+  hipLaunchKernelGGL(incrementIndex, 
+        grid, block, 0, stream, indices, k, increment);  
 }
 
 // If the inner size (dim) of the vectors is small, we want a larger query tile

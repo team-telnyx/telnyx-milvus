@@ -134,8 +134,9 @@ void runTransposeAny(Tensor<T, Dim, true>& in,
 
     auto grid = std::min(utils::divUp(totalSize, block), (size_t) 4096);
 
-    transposeAny<T, unsigned int, Dim, -1>
-      <<<grid, block, 0, stream>>>(inInfo, outInfo, totalSize);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(transposeAny<T, unsigned int, Dim, -1>), 
+      dim3(grid), dim3(block), 0, stream, inInfo, outInfo, totalSize);
+  
   } else {
     auto inInfo = getTensorInfo<T, unsigned long, Dim>(in);
     auto outInfo = getTensorInfo<T, unsigned long, Dim>(out);
@@ -145,8 +146,8 @@ void runTransposeAny(Tensor<T, Dim, true>& in,
 
     auto grid = std::min(utils::divUp(totalSize, block), (size_t) 4096);
 
-    transposeAny<T, unsigned long, Dim, -1>
-      <<<grid, block, 0, stream>>>(inInfo, outInfo, totalSize);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(transposeAny<T, unsigned long, Dim, -1>), 
+      grid, block, 0, stream, inInfo, outInfo, totalSize);      
   }
   HIP_TEST_ERROR();
 }

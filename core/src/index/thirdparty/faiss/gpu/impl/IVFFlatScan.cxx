@@ -223,8 +223,8 @@ runIVFFlatScanTile(Tensor<float, 2, true>& queries,
 
 #define RUN_IVF_FLAT                                                    \
   do {                                                                  \
-    ivfFlatScan                                                         \
-      <<<grid, block, codec.getSmemSize(dim), stream>>>(                \
+    hipLaunchKernelGGL(ivfFlatScan,                                                         \
+        grid, block, codec.getSmemSize(dim), stream,                    \
         queries,                                                        \
         useResidual,                                                    \
         residualBase,                                                   \

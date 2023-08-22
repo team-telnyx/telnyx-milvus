@@ -177,7 +177,7 @@ foreach(header ${FAISS_GPU_HEADERS})
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/faiss/gpu/${dir}
   )
 endforeach()
-message(STATUS " faiss >> gpu cmake")
+
 find_package(HIPToolkit REQUIRED)
 target_link_libraries(faiss PRIVATE HIP::hiprt hipblas)
 target_link_libraries(faiss_avx2 PRIVATE HIP::hiprt hipblas)

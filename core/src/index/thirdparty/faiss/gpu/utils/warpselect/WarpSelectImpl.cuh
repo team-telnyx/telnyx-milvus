@@ -37,8 +37,8 @@
     auto kInit = dir ? Limits<TYPE>::getMin() : Limits<TYPE>::getMax(); \
     auto vInit = -1;                                                    \
                                                                         \
-    warpSelect<TYPE, int, DIR, WARP_Q, THREAD_Q, kWarpSelectNumThreads> \
-      <<<grid, block, 0, stream>>>(in, outK, outV, kInit, vInit, k);    \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(warpSelect<TYPE, int, DIR, WARP_Q, THREAD_Q, kWarpSelectNumThreads>), \
+        grid, block, 0, stream, in, outK, outV, kInit, vInit, k);      \
     HIP_TEST_ERROR();                                                  \
   }
 

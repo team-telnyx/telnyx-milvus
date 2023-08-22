@@ -296,7 +296,7 @@ runIVFFlatScanTileSlice(
 
     // Copy the kth distance into minDistances
     auto nq = outDistances.getSize(0);
-    copyMinDistancePerQuery<<<1, nq, 0, stream>>>(minDistances, outDistances, k);
+    hipLaunchKernelGGL(copyMinDistancePerQuery, dim3(1), dim3(nq), 0, stream, minDistances, outDistances, k);
 
 //    auto min = (float*)malloc(sizeof(float) * nq);
 //auto tmp = minDistances.downcastInner<1>();
@@ -355,8 +355,8 @@ runIVFFlatScanTile(Tensor<float, 2, true>& queries,
 
 #define RUN_IVF_FLAT                                                    \
   do {                                                                  \
-    ivfFlatScan                                                         \
-      <<<grid, block, codec.getSmemSize(dim), stream>>>(                \
+    hipLaunchKernelGGL(ivfFlatScan,                                     \
+        grid, block, codec.getSmemSize(dim), stream,                    \
         queries,                                                        \
         useResidual,                                                    \
         residualBase,                                                   \

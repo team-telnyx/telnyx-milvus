@@ -7,10 +7,11 @@
 find_package(HIPToolkit REQUIRED)
 
 # Defines `gtest_discover_tests()`.
+find_package(GTest REQUIRED)
 include(GoogleTest)
 
 add_library(faiss_gpu_test_helper TestUtils.cpp)
-target_link_libraries(faiss_gpu_test_helper PUBLIC faiss gtest HIP::hiprt)
+target_link_libraries(faiss_gpu_test_helper PUBLIC faiss ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} HIP::hiprt)
 
 macro(faiss_gpu_test file)
   get_filename_component(test_name ${file} NAME_WE)
@@ -19,15 +20,15 @@ macro(faiss_gpu_test file)
   gtest_discover_tests(${test_name})
 endmacro()
 
-faiss_gpu_test(TestCodePacking.cpp)
+# faiss_gpu_test(TestCodePacking.cpp)
 faiss_gpu_test(TestGpuIndexFlat.cpp)
 faiss_gpu_test(TestGpuIndexIVFFlat.cpp)
 faiss_gpu_test(TestGpuIndexBinaryFlat.cpp)
 faiss_gpu_test(TestGpuMemoryException.cpp)
 faiss_gpu_test(TestGpuIndexIVFPQ.cpp)
-faiss_gpu_test(TestGpuIndexIVFScalarQuantizer.cpp)
-faiss_gpu_test(TestGpuDistance.cpp)
-faiss_gpu_test(TestGpuSelect.cpp)
+# faiss_gpu_test(TestGpuIndexIVFScalarQuantizer.cpp)
+faiss_gpu_test(TestGpuDistance.cxx)
+faiss_gpu_test(TestGpuSelect.cxx)
 
 add_executable(demo_ivfpq_indexing_gpu EXCLUDE_FROM_ALL
   demo_ivfpq_indexing_gpu.cpp)

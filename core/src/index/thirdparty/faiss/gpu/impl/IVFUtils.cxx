@@ -54,7 +54,7 @@ void runCalcListOffsets(Tensor<int, 2, true>& topQueryToCentroid,
   auto grid = dim3(numBlocks);
   auto block = dim3(numThreads);
 
-  getResultLengths<<<grid, block, 0, stream>>>(
+  hipLaunchKernelGGL(getResultLengths, grid, block, 0, stream,
     topQueryToCentroid,
     listLengths.data().get(),
     totalSize,

@@ -213,19 +213,19 @@ void runL2Norm(Tensor<T, 2, true, IndexType>& input,
   do {                                                                  \
     if (normLoop) {                                                     \
       if (normSquared) {                                                \
-        l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, true, true> \
-          <<<grid, block, smem, stream>>>(INPUT, output);               \
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, true, true>), \
+               grid, block, smem, stream, INPUT, output);               \
       } else {                                                          \
-        l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, true, false> \
-          <<<grid, block, smem, stream>>>(INPUT, output);               \
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, true, false>), \
+               grid, block, smem, stream, INPUT, output);               \
       }                                                                 \
     } else {                                                            \
       if (normSquared) {                                                \
-        l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, false, true> \
-          <<<grid, block, smem, stream>>>(INPUT, output);               \
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, false, true>), \
+              grid, block, smem, stream, INPUT, output);                \
       } else {                                                          \
-        l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, false, false> \
-          <<<grid, block, smem, stream>>>(INPUT, output);               \
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormRowMajor<TYPE_T, TYPE_TVEC, IndexType, rowTileSize, false, false>), \
+               grid, block, smem, stream, INPUT, output);               \
       }                                                                 \
     }                                                                   \
   } while (0)
@@ -279,10 +279,10 @@ void runL2Norm(Tensor<T, 2, true, IndexType>& input,
                (IndexType) 65536);
 
     if (normSquared) {
-      l2NormColMajor<T, IndexType, true><<<grid, block, 0, stream>>>(
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormColMajor<T, IndexType, true>), grid, block, 0, stream,
         input, output);
     } else {
-      l2NormColMajor<T, IndexType, false><<<grid, block, 0, stream>>>(
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(l2NormColMajor<T, IndexType, false>), grid, block, 0, stream,
         input, output);
     }
   }

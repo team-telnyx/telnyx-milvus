@@ -75,9 +75,10 @@ double getmillisecs () {
 uint64_t get_cycles () {
 #ifdef  __x86_64__
     uint32_t high, low;
-    asm volatile("rdtsc \n\t"
-                 : "=a" (low),
-                   "=d" (high));
+    // TODO: HADI
+    // asm volatile("rdtsc \n\t"
+    //              : "=a" (low),
+    //                "=d" (high));
     return ((uint64_t)high << 32) | (low);
 #else
     return 0;

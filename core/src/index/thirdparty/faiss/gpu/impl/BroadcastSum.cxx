@@ -242,15 +242,15 @@ void runSumAlongColumns(Tensor<T, 1, true>& input,
       dim3(utils::divUp(outputV.getSize(0), kRowsPerBlock),
            utils::divUp(outputV.getSize(1), threadsPerBlock * kColLoad));
 
-    sumAlongColumns<TVec, kRowsPerBlock, kRowUnroll, kColLoad>
-      <<<grid, block, 0, stream>>>(inputV, outputV);
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(sumAlongColumns<TVec, kRowsPerBlock, kRowUnroll, kColLoad>), 
+            grid, block, 0, stream, inputV, outputV);
   } else {
     auto grid =
       dim3(utils::divUp(output.getSize(0), kRowsPerBlock),
            utils::divUp(output.getSize(1), threadsPerBlock * kColLoad));
 
-    sumAlongColumns<T, kRowsPerBlock, kRowUnroll, kColLoad>
-      <<<grid, block, 0, stream>>>(input, output);
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(sumAlongColumns<T, kRowsPerBlock, kRowUnroll, kColLoad>), 
+            grid, block, 0, stream, input, output);
   }
 
   HIP_TEST_ERROR();
@@ -292,15 +292,17 @@ void runAssignAlongColumns(Tensor<T, 1, true>& input,
       dim3(utils::divUp(outputV.getSize(0), kRowsPerBlock),
            utils::divUp(outputV.getSize(1), threadsPerBlock * kColLoad));
 
-    assignAlongColumns<TVec, kRowsPerBlock, kRowUnroll, kColLoad>
-      <<<grid, block, 0, stream>>>(inputV, outputV);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(assignAlongColumns<TVec, kRowsPerBlock, kRowUnroll, kColLoad>), 
+          grid, block, 0, stream, inputV, outputV);     
+          
   } else {
     auto grid =
       dim3(utils::divUp(output.getSize(0), kRowsPerBlock),
            utils::divUp(output.getSize(1), threadsPerBlock * kColLoad));
 
-    assignAlongColumns<T, kRowsPerBlock, kRowUnroll, kColLoad>
-      <<<grid, block, 0, stream>>>(input, output);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(assignAlongColumns<T, kRowsPerBlock, kRowUnroll, kColLoad>), 
+          grid, block, 0, stream, input, output);   
+          
   }
 
   HIP_TEST_ERROR();
@@ -333,9 +335,11 @@ void runSumAlongRows(Tensor<T, 1, true>& input,
   auto block = dim3(threadsPerBlock);
 
   if (zeroClamp) {
-    sumAlongRows<T, true><<<grid, block, 0, stream>>>(input, output);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(sumAlongRows<T, true>), 
+          grid, block, 0, stream, input, output);  
   } else {
-    sumAlongRows<T, false><<<grid, block, 0, stream>>>(input, output);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(sumAlongRows<T, false>), 
+          grid, block, 0, stream, input, output);  
   }
 
   HIP_TEST_ERROR();

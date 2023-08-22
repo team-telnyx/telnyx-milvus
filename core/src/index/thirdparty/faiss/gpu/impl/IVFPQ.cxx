@@ -162,18 +162,18 @@ IVFPQ::classifyAndAddVectors(Tensor<float, 2, true>& vecs,
   DeviceTensor<float, 2, true> residuals(
     mem, {vecs.getSize(0), vecs.getSize(1)}, stream);
 
-#ifdef FAISS_USE_FLOAT16
-  if (quantizer_->getUseFloat16()) {
-    auto& coarseCentroids = quantizer_->getVectorsFloat16Ref();
-    runCalcResidual(vecs, coarseCentroids, listIds, residuals, stream);
-  } else {
+// #ifdef FAISS_USE_FLOAT16
+//   if (quantizer_->getUseFloat16()) {
+//     auto& coarseCentroids = quantizer_->getVectorsFloat16Ref();
+//     runCalcResidual(vecs, coarseCentroids, listIds, residuals, stream);
+//   } else {
+//     auto& coarseCentroids = quantizer_->getVectorsFloat32Ref();
+//     runCalcResidual(vecs, coarseCentroids, listIds, residuals, stream);
+//   }
+// #else
     auto& coarseCentroids = quantizer_->getVectorsFloat32Ref();
     runCalcResidual(vecs, coarseCentroids, listIds, residuals, stream);
-  }
-#else
-    auto& coarseCentroids = quantizer_->getVectorsFloat32Ref();
-    runCalcResidual(vecs, coarseCentroids, listIds, residuals, stream);
-#endif
+// #endif
 
   // Residuals are in the form
   // (vec x numSubQuantizer x dimPerSubQuantizer)
@@ -530,32 +530,33 @@ IVFPQ::precomputeCodesT_() {
 
   // We added into the view, so `coarsePQProductTransposed` is now our
   // precomputed term 2.
-#ifdef FAISS_USE_FLOAT16
-  if (useFloat16LookupTables_) {
-    precomputedCodeHalf_ =
-      convertTensor<float, half, 3>(resources_,
-                                    resources_->getDefaultStreamCurrentDevice(),
-                                    coarsePQProductTransposed);
-  } else {
-    precomputedCode_ = std::move(coarsePQProductTransposed);
-  }
-#else
+// #ifdef FAISS_USE_FLOAT16
+//   if (useFloat16LookupTables_) {
+//     precomputedCodeHalf_ =
+//       convertTensor<float, half, 3>(resources_,
+//                                     resources_->getDefaultStreamCurrentDevice(),
+//                                     coarsePQProductTransposed);
+//   } else {
+//     precomputedCode_ = std::move(coarsePQProductTransposed);
+//   }
+// #else
   precomputedCode_ = std::move(coarsePQProductTransposed);
-#endif
+// #endif
 
 }
 
 void
 IVFPQ::precomputeCodes_() {
-#ifdef FAISS_USE_FLOAT16
-  if (quantizer_->getUseFloat16()) {
-    precomputeCodesT_<half>();
-  } else {
-    precomputeCodesT_<float>();
-  }
-#else
+// TODO: HADI  
+// #ifdef FAISS_USE_FLOAT16
+//   if (quantizer_->getUseFloat16()) {
+//     precomputeCodesT_<half>();
+//   } else {
+//     precomputeCodesT_<float>();
+//   }
+// #else
   precomputeCodesT_<float>();
-#endif
+// #endif
 }
 
 void
@@ -778,16 +779,25 @@ IVFPQ::runPQNoPrecomputedCodes_(
   int k,
   Tensor<float, 2, true>& outDistances,
   Tensor<long, 2, true>& outIndices) {
-#ifdef FAISS_USE_FLOAT16
-  if (quantizer_->getUseFloat16()) {
-    runPQNoPrecomputedCodesT_<half>(queries,
-                                    bitset,
-                                    coarseDistances,
-                                    coarseIndices,
-                                    k,
-                                    outDistances,
-                                    outIndices);
-  } else {
+// #ifdef FAISS_USE_FLOAT16
+//   if (quantizer_->getUseFloat16()) {
+//     runPQNoPrecomputedCodesT_<half>(queries,
+//                                     bitset,
+//                                     coarseDistances,
+//                                     coarseIndices,
+//                                     k,
+//                                     outDistances,
+//                                     outIndices);
+//   } else {
+//     runPQNoPrecomputedCodesT_<float>(queries,
+//                                      bitset,
+//                                      coarseDistances,
+//                                      coarseIndices,
+//                                      k,
+//                                      outDistances,
+//                                      outIndices);
+//     }
+// #else
     runPQNoPrecomputedCodesT_<float>(queries,
                                      bitset,
                                      coarseDistances,
@@ -795,16 +805,7 @@ IVFPQ::runPQNoPrecomputedCodes_(
                                      k,
                                      outDistances,
                                      outIndices);
-    }
-#else
-    runPQNoPrecomputedCodesT_<float>(queries,
-                                     bitset,
-                                     coarseDistances,
-                                     coarseIndices,
-                                     k,
-                                     outDistances,
-                                     outIndices);
-#endif
+// #endif
 
 }
 

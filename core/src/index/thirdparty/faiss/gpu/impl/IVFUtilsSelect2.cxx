@@ -143,8 +143,9 @@ runPass2SelectLists(Tensor<float, 2, true>& heapDistances,
 
 #define RUN_PASS(BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR)                  \
   do {                                                                  \
-    pass2SelectLists<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>              \
-      <<<grid, BLOCK, 0, stream>>>(heapDistances,                       \
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(pass2SelectLists<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>),    \
+                                   grid, dim3(BLOCK), 0, stream,        \
+                                   heapDistances,                       \
                                    heapIndices,                         \
                                    listIndices.data().get(),            \
                                    prefixSumOffsets,                    \

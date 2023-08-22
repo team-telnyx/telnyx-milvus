@@ -84,11 +84,11 @@ void calcResidual(Tensor<float, 2, true>& vecs,
   dim3 block(std::min(vecs.getSize(1), maxThreads));
 
   if (largeDim) {
-    calcResidual<CentroidT, true><<<grid, block, 0, stream>>>(
-      vecs, centroids, vecToCentroid, residuals);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(calcResidual<CentroidT, true>), 
+      grid, block, 0, stream, vecs, centroids, vecToCentroid, residuals);
   } else {
-    calcResidual<CentroidT, false><<<grid, block, 0, stream>>>(
-      vecs, centroids, vecToCentroid, residuals);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(calcResidual<CentroidT, false>), 
+      grid, block, 0, stream, vecs, centroids, vecToCentroid, residuals);
   }
 
   HIP_TEST_ERROR();
@@ -107,7 +107,8 @@ void gatherReconstruct(Tensor<int, 1, true>& listIds,
   int maxThreads = getMaxThreadsCurrentDevice();
   dim3 block(std::min(vecs.getSize(1), maxThreads));
 
-  gatherReconstruct<T><<<grid, block, 0, stream>>>(listIds, vecs, out);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(gatherReconstruct<T>), 
+    grid, block, 0, stream, listIds, vecs, out); 
 
   HIP_TEST_ERROR();
 }

@@ -315,9 +315,9 @@ runResidualVector(Tensor<float, 3, true>& pqCentroids,
     dim3(topQueryToCentroid.getSize(0), topQueryToCentroid.getSize(1));
   auto block = dim3(std::min(queries.getSize(1), getMaxThreadsCurrentDevice()));
 
-  residualVector<<<grid, block, 0, stream>>>(
-    queries, coarseCentroids, topQueryToCentroid, pqCentroids.getSize(1),
-    residual);
+    hipLaunchKernelGGL(residualVector, 
+      grid, block, 0, stream, queries, coarseCentroids, topQueryToCentroid, 
+      pqCentroids.getSize(1), residual);
 
   HIP_TEST_ERROR();
 }
@@ -497,14 +497,16 @@ runPQCodeDistances(Tensor<float, 3, true>& pqCentroids,
     if (useFloat16Lookup) {                                             \
       auto outCodeDistancesT = outCodeDistances.toTensor<half>();       \
                                                                         \
-      pqCodeDistances<half, DIMS, L2><<<grid, block, smem, stream>>>(   \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(pqCodeDistances<half, DIMS, L2>),  \
+        grid, block, smem, stream,                                      \
         queries, kQueriesPerBlock,                                      \
         coarseCentroids, pqCentroids,                                   \
         topQueryToCentroid, outCodeDistancesT);                         \
     } else {                                                              \
      auto outCodeDistancesT = outCodeDistances.toTensor<float>();       \
                                                                         \
-      pqCodeDistances<float, DIMS, L2><<<grid, block, smem, stream>>>(  \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(pqCodeDistances<float, DIMS, L2>),  \
+        grid, block, smem, stream,                                      \
         queries, kQueriesPerBlock,                                      \
         coarseCentroids, pqCentroids,                                   \
         topQueryToCentroid, outCodeDistancesT);                         \
@@ -516,7 +518,8 @@ runPQCodeDistances(Tensor<float, 3, true>& pqCentroids,
       if(!useFloat16Lookup){                                            \
       auto outCodeDistancesT = outCodeDistances.toTensor<float>();      \
                                                                         \
-      pqCodeDistances<float, DIMS, L2><<<grid, block, smem, stream>>>(  \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(pqCodeDistances<float, DIMS, L2>),  \
+        grid, block, smem, stream,                                      \
         queries, kQueriesPerBlock,                                      \
         coarseCentroids, pqCentroids,                                   \
         topQueryToCentroid, outCodeDistancesT);                         \

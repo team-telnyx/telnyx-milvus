@@ -19,9 +19,9 @@
 // #endif
 
 // Some compute capabilities have full float16 ALUs.
-// #if defined(__HIP_PLATFORM_HCC__) && (__HIP_DEVICE_ARCH_MAJOR__ >= 9)
+#if __HIP_ARCH_HAS_FP16__
 #define FAISS_USE_FULL_FLOAT16 1
-// #endif // __HIP_DEVICE_ARCH_MAJOR__ types
+#endif // __HIP_ARCH_HAS_FP16__ types
 
 
 // #ifdef FAISS_USE_FLOAT16

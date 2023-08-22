@@ -57,11 +57,31 @@ rawGemm(hipblasHandle_t  handle,
   //                      B, cBT, ldb,
   //                      &fBeta,
   //                      C, HIPBLAS_R_32F, ldc);
-  return hipblasSgemm(handle, transa, transb, m, n, k,
-                      &fAlpha, A, lda,
-                      B, ldb,
-                      &fBeta,
-                      C, ldc);
+  // return hipblasSgemm(handle, transa, transb, m, n, k,
+  //                     &fAlpha, A, lda,
+  //                     B, ldb,
+  //                     &fBeta,
+  //                     C, ldc);
+    return hipblasGemmEx(
+            handle,
+            transa,
+            transb,
+            m,
+            n,
+            k,
+            &fAlpha,
+            A,
+            cAT,
+            lda,
+            B,
+            cBT,
+            ldb,
+            &fBeta,
+            C,
+            HIPBLAS_R_32F,
+            ldc,
+            HIPBLAS_R_32F,
+            HIPBLAS_GEMM_DEFAULT);
 }
 
 template <typename AT, typename BT>

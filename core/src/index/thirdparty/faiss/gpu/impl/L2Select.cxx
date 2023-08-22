@@ -253,16 +253,16 @@ void runL2SelectMin(Tensor<T, 2, true>& productDistances,
     auto block = dim3(kThreadsPerBlock);
     auto grid = dim3(utils::divUp(outDistances.getSize(0), kRowsPerBlock));
 
-    l2SelectMin1<T, kRowsPerBlock, kThreadsPerBlock>
-      <<<grid, block, 0, stream>>>(productDistances, centroidDistances, bitset,
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(l2SelectMin1<T, kRowsPerBlock, kThreadsPerBlock>),
+       grid, block, 0, stream, productDistances, centroidDistances, bitset,
                                    outDistances, outIndices);
   } else {
     auto grid = dim3(outDistances.getSize(0));
 
 #define RUN_L2_SELECT(BLOCK, NUM_WARP_Q, NUM_THREAD_Q)                  \
     do {                                                                \
-      l2SelectMinK<T, NUM_WARP_Q, NUM_THREAD_Q, BLOCK>                  \
-        <<<grid, BLOCK, 0, stream>>>(productDistances, centroidDistances, bitset, \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(l2SelectMinK<T, NUM_WARP_Q, NUM_THREAD_Q, BLOCK>),  \
+        grid, dim3(BLOCK), 0, stream, productDistances, centroidDistances, bitset, \
                                      outDistances, outIndices,          \
                                      k, Limits<T>::getMax());           \
     } while (0)
@@ -324,16 +324,16 @@ void runL2SelMn(float* hostOutDistances,
     auto block = dim3(kThreadsPerBlock);
     auto grid = dim3(utils::divUp(outDistances.getSize(0), kRowsPerBlock));
 
-    l2SelectMin1<float, kRowsPerBlock, kThreadsPerBlock>
-      <<<grid, block, 0, stream>>>(productDistances, centroidDistances, bitset,
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(l2SelectMin1<float, kRowsPerBlock, kThreadsPerBlock>),
+       grid, block, 0, stream, productDistances, centroidDistances, bitset,
                                    outDistances, outIndices);
   } else {
     auto grid = dim3(outDistances.getSize(0));
 
 #define RUN_L2_SELECT(BLOCK, NUM_WARP_Q, NUM_THREAD_Q)                  \
     do {                                                                \
-      l2SelectMinK<float, NUM_WARP_Q, NUM_THREAD_Q, BLOCK>                  \
-        <<<grid, BLOCK, 0, stream>>>(productDistances, centroidDistances,  \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(l2SelectMinK<float, NUM_WARP_Q, NUM_THREAD_Q, BLOCK>),  \
+            grid, BLOCK, 0, stream, productDistances, centroidDistances,  \
                                      outDistances, outIndices,          \
                                      k, Limits<float>::getMax(), i);           \
     } while (0)

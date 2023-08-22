@@ -289,8 +289,8 @@ runMultiPassTile(Tensor<float, 2, true>& queries,
     do {                                                                \
       auto codeDistancesT = codeDistances.toTensor<LOOKUP_T>();         \
                                                                         \
-      pqScanNoPrecomputedMultiPass<NUM_SUB_Q, LOOKUP_T, LOOKUP_VEC_T>   \
-        <<<grid, block, smem, stream>>>(                                \
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(pqScanNoPrecomputedMultiPass<NUM_SUB_Q, LOOKUP_T, LOOKUP_VEC_T>),   \
+          grid, block, smem, stream,                                    \
           queries,                                                      \
           pqCentroidsInnermostCode,                                     \
           topQueryToCentroid,                                           \

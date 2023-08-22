@@ -124,8 +124,9 @@ runPass1SelectLists(thrust::device_vector<void*>& listIndices,
 
 #define RUN_PASS(BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR)                  \
   do {                                                                  \
-    pass1SelectLists<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>              \
-      <<<grid, BLOCK, 0, stream>>>(listIndices.data().get(),            \
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(pass1SelectLists<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>),              \
+                                   grid, dim3(BLOCK), 0, stream,              \
+                                   listIndices.data().get(),            \
                                    prefixSumOffsets,                    \
                                    topQueryToCentroid,                  \
                                    bitset,                              \
@@ -286,8 +287,9 @@ runPass1SelectLists(Tensor<int, 2, true>& prefixSumOffsets,
 
 #define RUN_PASS(BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR)                  \
   do {                                                                  \
-    pass1SelectListsLimitDistance<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>              \
-      <<<grid, BLOCK, 0, stream>>>(prefixSumOffsets,                    \
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(pass1SelectListsLimitDistance<BLOCK, NUM_WARP_Q, NUM_THREAD_Q, DIR>),   \
+                                   grid, BLOCK, 0, stream,              \
+                                   prefixSumOffsets,                    \
                                    distance,                            \
                                    nprobe,                              \
                                    k,                                   \

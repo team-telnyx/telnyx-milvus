@@ -246,7 +246,8 @@ void runGeneralDistanceKernel(Tensor<T, 2, InnerContig>& vecs,
             utils::divUp(query.getSize(0), kWarpSize));
   dim3 block(kWarpSize, kWarpSize);
 
-  generalDistance<<<grid, block, 0, stream>>>(query, vecs, op, out);
+  hipLaunchKernelGGL(generalDistance, 
+        grid, block, 0, stream, query, vecs, op, out); 
 }
 
 template <typename T, typename DistanceOp, bool InnerContig>
