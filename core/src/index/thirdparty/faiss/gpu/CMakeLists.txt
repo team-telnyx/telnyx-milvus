@@ -165,6 +165,10 @@
 file(GLOB FAISS_GPU_SRC "*.cpp" "impl/*.cpp" "utils/*.cpp" "*.cxx" "impl/*.cxx" "utils/*.cxx" "utils/nvidia/*.cxx" "utils/blockselect/*.cxx" "utils/warpselect/*.cxx")
 file(GLOB FAISS_GPU_HEADERS  "*.h" "*.cuh" "impl/*.h" "impl/*.cuh" "utils/*.h" "utils/*.cuh" "utils/nvidia/*.h" "utils/blockselect/*.cuh" "utils/warpselect/*.cuh")
 
+# Exclude files containing "avx512" in their names
+list(FILTER FAISS_GPU_SRC EXCLUDE REGEX ".*avx512.*")
+list(FILTER FAISS_GPU_HEADERS EXCLUDE REGEX ".*avx512.*")
+
 # Export FAISS_GPU_HEADERS variable to parent scope.
 set(FAISS_GPU_HEADERS ${FAISS_GPU_HEADERS} PARENT_SCOPE)
 

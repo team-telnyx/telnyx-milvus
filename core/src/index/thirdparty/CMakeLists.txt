@@ -16,7 +16,7 @@ include(GNUInstallDirs)
 include(CheckLanguage)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3 -mavx -mf16c -mavx2 -mavx512f -mavx512dq -mavx512bw")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mf16c -mavx2") #-msse3 -mavx512f  -mavx512dq -mavx512bw
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Valid values are "generic", "avx2".
@@ -61,7 +61,7 @@ if(FAISS_ENABLE_C_API)
 endif()
 
 # TODO: HADI
-# add_subdirectory(demos)
+add_subdirectory(faiss/demos)
 # add_subdirectory(benchs)
 # add_subdirectory(tutorial/cpp)
 

@@ -20,7 +20,7 @@
 #include <vector>
 
 void testForSize(int rows, int cols, int k, bool dir, bool warp) {
- /* std::vector<float> v = faiss::gpu::randVecs(rows, cols);
+  std::vector<float> v = faiss::gpu::randVecs(rows, cols);
   faiss::gpu::HostTensor<float, 2, true> hostVal({rows, cols});
 
   for (int r = 0; r < rows; ++r) {
@@ -110,9 +110,9 @@ void testForSize(int rows, int cols, int k, bool dir, bool warp) {
                   << gpuInd << " " << cpuInd;
       }
     }
-  }*/
+  }
 }
-/*
+
 // General test
 TEST(TestGpuSelect, test) {
   for (int i = 0; i < 10; ++i) {
@@ -170,7 +170,7 @@ TEST(TestGpuSelect, test1Warp) {
     testForSize(rows, cols, 1, dir, true);
   }
 }
-*/
+
 // Test for where k = #cols exactly (we are returning all the values,
 // just sorted)
 TEST(TestGpuSelect, testExactWarp) {

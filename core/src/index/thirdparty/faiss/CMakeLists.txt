@@ -7,10 +7,14 @@
 file(GLOB FAISS_HEADERS "*.h" "impl/*.h" "utils/*.h" "gpu/*.h" "gpu/impl/*.h" "gpu/impl/*.cuh" "gpu/utils/*.h" "gpu/utils/*.cuh" "gpu/utils/nvidia/*.h" "gpu/utils/blockselect/*.cuh" "gpu/utils/warpselect/*.cuh")
 file(GLOB FAISS_SRC "*.cpp" "impl/*.cpp" "utils/*.cpp")
 
+# Exclude files containing "avx512" in their names
+list(FILTER FAISS_SRC EXCLUDE REGEX ".*avx512.*")
+list(FILTER FAISS_HEADERS EXCLUDE REGEX ".*avx512.*")
+
 # Export FAISS_HEADERS variable to parent scope.
 set(FAISS_HEADERS ${FAISS_HEADERS} PARENT_SCOPE)
 
-add_library(faiss STATIC ${FAISS_SRC})
+add_library(faiss SHARED ${FAISS_SRC})
 
 add_library(faiss_avx2 ${FAISS_SRC})
 if(NOT FAISS_OPT_LEVEL STREQUAL "avx2")
@@ -78,7 +82,7 @@ else()
   target_link_libraries(faiss_avx2 PUBLIC ${LAPACK_LIB}) 
 endif()
 
-# add_subdirectory(gpu/test)
+add_subdirectory(gpu/test)
 
 install(TARGETS faiss
   EXPORT faiss-targets

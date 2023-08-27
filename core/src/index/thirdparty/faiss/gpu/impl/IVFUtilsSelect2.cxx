@@ -63,7 +63,7 @@ pass2SelectLists(Tensor<float, 2, true> heapDistances,
                  Tensor<float, 2, true> outDistances,
                  Tensor<long, 2, true> outIndices) {
                   // TODO: HADI
-                  /*
+                  
   constexpr int kNumWarps = ThreadsPerBlock / kWarpSize;
 
   __shared__ float smemK[kNumWarps * NumWarpQ];
@@ -124,7 +124,7 @@ pass2SelectLists(Tensor<float, 2, true> heapDistances,
     }
 
     outIndices[queryId][i] = index;
-  }*/
+  }
 }
 
 void

@@ -16,7 +16,7 @@
 
 namespace faiss {
 
-bool faiss_use_avx512 = true;
+bool faiss_use_avx512 = false;
 bool faiss_use_avx2 = true;
 bool faiss_use_sse = true;
 
@@ -33,6 +33,7 @@ sq_sel_inv_list_scanner_func_ptr sq_sel_inv_list_scanner = sq_select_inverted_li
 /*****************************************************************************/
 
 bool support_avx512() {
+    return false;
     if (!faiss_use_avx512) return false;
 
     InstructionSet& instruction_set_inst = InstructionSet::GetInstance();

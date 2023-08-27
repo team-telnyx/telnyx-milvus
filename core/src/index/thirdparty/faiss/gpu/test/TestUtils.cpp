@@ -7,7 +7,7 @@
 
 
 #include <faiss/gpu/test/TestUtils.h>
-// #include <faiss/utils/random.h>
+#include <faiss/utils/random.h>
 #include <cmath>
 #include <gtest/gtest.h>
 #include <set>
@@ -52,23 +52,23 @@ bool randBool() {
 
 std::vector<float> randVecs(size_t num, size_t dim) {
   std::vector<float> v(num * dim);
-/*
+
   faiss::float_rand(v.data(), v.size(), s_seed);
   // unfortunately we generate separate sets of vectors, and don't
   // want the same values
   ++s_seed;
-*/
+
   return v;
 }
 
 std::vector<unsigned char> randBinaryVecs(size_t num, size_t dim) {
   std::vector<unsigned char> v(num * (dim / 8));
-/*
+
   faiss::byte_rand(v.data(), v.size(), s_seed);
   // unfortunately we generate separate sets of vectors, and don't
   // want the same values
   ++s_seed;
-*/
+
   return v;
 }
 
@@ -82,7 +82,7 @@ void compareIndices(
     const std::string& configMsg,
     float maxRelativeError,
     float pctMaxDiff1,
-    float pctMaxDiffN) {/*
+    float pctMaxDiffN) {
   // Compare
   std::vector<float> refDistance(numQuery * k, 0);
   std::vector<faiss::Index::idx_t> refIndices(numQuery * k, -1);
@@ -101,7 +101,7 @@ void compareIndices(
                            numQuery, k,
                            configMsg,
                            true, false, true,
-                           maxRelativeError, pctMaxDiff1, pctMaxDiffN);*/
+                           maxRelativeError, pctMaxDiff1, pctMaxDiffN);
 }
 
 void compareIndices(faiss::Index& refIndex,
@@ -110,7 +110,7 @@ void compareIndices(faiss::Index& refIndex,
                     const std::string& configMsg,
                     float maxRelativeError,
                     float pctMaxDiff1,
-                    float pctMaxDiffN) {/*
+                    float pctMaxDiffN) {
   auto queryVecs = faiss::gpu::randVecs(numQuery, dim);
 
   compareIndices(queryVecs,
@@ -120,7 +120,7 @@ void compareIndices(faiss::Index& refIndex,
                  configMsg,
                  maxRelativeError,
                  pctMaxDiff1,
-                 pctMaxDiffN);*/
+                 pctMaxDiffN);
 }
 
 template <typename T>
@@ -138,7 +138,7 @@ void compareLists(const float* refDist,
                   float maxRelativeError,
                   float pctMaxDiff1,
                   float pctMaxDiffN) {
-/*
+
   float maxAbsErr = 0.0f;
   for (int i = 0; i < dim1 * dim2; ++i) {
     maxAbsErr = std::max(maxAbsErr, std::abs(refDist[i] - testDist[i]));
@@ -309,7 +309,7 @@ void compareLists(const float* refDist,
         }
       }
     }
-  }*/
+  }
 }
 
 } }

@@ -63,6 +63,8 @@ dkms.conf
 /AnnService/SocketLib.vcxproj.user
 /PythonWrapper/PythonCore.vcxproj.user
 /build
+/RelWithDebInfo
+/Debug
 /PythonWrapper/inc/ClientInterface_wrap.cxx
 /PythonWrapper/inc/CoreInterface_wrap.cxx
 /PythonWrapper/inc/SPTAG.py

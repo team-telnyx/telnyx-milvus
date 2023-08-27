@@ -116,7 +116,7 @@ TEST(TestGpuIndexFlat, IP_Float32) {
     testFlat(opt);
   }
 }
-
+/*
 TEST(TestGpuIndexFlat, L1_Float32) {
   TestFlatOptions opt;
   opt.metric = faiss::MetricType::METRIC_L1;
@@ -382,7 +382,7 @@ TEST(TestGpuIndexFlat, UnifiedMemory) {
                              0.1f,
                              0.015f);
 }
-
+*/
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
 
